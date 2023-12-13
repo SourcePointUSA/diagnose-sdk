@@ -1,0 +1,182 @@
+openapi: 3.0.3
+
+info:
+  title: Diagnose API
+  description: Diagnose analytics api
+  version: 0.0.1
+servers:
+  - url: "https://figure.this.out.com/diangose/v0"
+    description: prod
+
+components:
+  securitySchemes:
+    # TODO what does sourcepoint need here
+    ApiKeyAuth:
+      type: apiKey
+      name: x-api-key
+      in: header
+  responses:
+    UnexpectedError:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    UnauthorizedError:
+      description: API key is missing or invalid
+      headers:
+        WWW_Authenticate:
+          schema:
+            type: string
+    ForbiddenError:
+      description: Resource access forbidden
+  schemas:
+    ClientConfig:
+      type: object
+      properties:
+        version:
+          type: string
+        active:
+          type: boolean
+        samplePercentage:
+          type: number
+        dbVersion:
+          type: string
+    VendorDbLarge:
+      type: object
+      properties:
+        version:
+          type: string
+        rows:
+          type: array
+          items:
+            $ref: "#/components/schemas/VendorDbRow"
+    VendorDbRow:
+      type: object
+      properties:
+        id:
+          type: string
+        domain:
+          type: string
+        kind:
+          type: integer
+    RecordEventsRequest:
+      type: object
+      properties:
+        clientId:
+          type: string
+        appId:
+          type: string
+        eventsLarge:
+          type: array
+          items:
+            $ref: "#/components/schemas/EventLarge"
+    EventLarge:
+      type: object
+      properties:
+        ts:
+          type: number
+        domain:
+          type: string
+        valid:
+          type: boolean
+        state:
+          type: array
+          items:
+            type: string
+    RecordEventsResponse:
+      type: object
+    ErrorMessage:
+      type: object
+      required:
+        - error_code
+        - error_message
+      properties:
+        error_code:
+          type: string
+        error_message:
+          type: string
+paths:
+  # todo need to know client type?
+  /config/client/{clientId}/app/{appId}/region/{regionId}:
+    get:
+      operationId: getConfig
+      description: get session config
+      security:
+        - ApiKeyAuth: []
+      parameters:
+        - name: clientId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: appId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: regionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClientConfig"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /dbLarge:
+    get:
+      operationId: getDbLarge
+      description: get current vendor db
+      security:
+        - ApiKeyAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VendorDbLarge"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /recordEvents:
+    post:
+      operationId: recordEvents
+      description: record a series of events
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/RecordEventsRequest'
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RecordEventsResponse"
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+
+security:
+  - ApiKeyAuth: []
