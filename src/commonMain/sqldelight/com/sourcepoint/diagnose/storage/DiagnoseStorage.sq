@@ -1,0 +1,95 @@
+import com.sourcepoint.diagnose.storage.EventFlags;
+import com.sourcepoint.diagnose.storage.DiagnoseConfig;
+
+
+CREATE TABLE Config (
+  configTime INTEGER PRIMARY KEY NOT NULL,
+  version TEXT NOT NULL,
+  value TEXT AS DiagnoseConfig NOT NULL
+);
+
+CREATE TABLE Vendor (
+  vendorId TEXT PRIMARY KEY NOT NULL,
+  kind INTEGER NOT NULL,
+  domain TEXT NOT NULL UNIQUE,
+  iabId INTEGER
+);
+
+CREATE INDEX vendor_domain ON Vendor(domain);
+
+CREATE TABLE ConsentString (
+  consentStringId INTEGER PRIMARY KEY NOT NULL,
+  kind INTEGER NOT NULL,
+  value TEXT NOT NULL,
+  UNIQUE(kind, value)
+);
+
+CREATE TABLE StateString (
+  stateStringId INTEGER PRIMARY KEY NOT NULL,
+  kind INTEGER NOT NULL,
+  value TEXT NOT NULL,
+  UNIQUE(kind, value)
+);
+
+CREATE TABLE EventV1 (
+  eventTime INTEGER PRIMARY KEY NOT NULL,
+  flags INTEGER AS EventFlags NOT NULL,
+  vendorId INTEGER NOT NULL,
+  consentStringId INTEGER NOT NULL,
+  stateStringId INTEGER NOT NULL,
+  FOREIGN KEY(stateStringId) REFERENCES StateString(stateStringId),
+  FOREIGN KEY(consentStringId) REFERENCES ConsentString(consentStringId),
+  FOREIGN KEY(vendorId) REFERENCES Vendor(vendorId)
+);
+
+addConfig:
+INSERT INTO Config VALUES ?;
+
+getLatestConfig:
+SELECT
+    value
+FROM
+    Config
+WHERE
+    configTime = ( SELECT MAX(configTime) FROM Config )
+AND
+    version = ?;
+
+clearOldConfigs:
+DELETE FROM
+    Config
+WHERE
+    configTime < ( SELECT MAX(configTime) FROM Config )
+;
+
+insertVendor:
+INSERT INTO Vendor VALUES ?;
+
+getVendorDatabase:
+SELECT * FROM Vendor;
+
+getAllEventsForSend:
+SELECT
+    *
+FROM
+    EventV1
+ORDER BY
+    eventTime ASC;
+
+clearEvents:
+DELETE FROM
+    EventV1
+WHERE
+    eventTime < ?
+AND
+    eventTime NOT IN ?
+;
+
+selectVendorById:
+SELECT * FROM Vendor WHERE vendorId IN ?;
+
+selectStateStringById:
+SELECT * FROM StateString WHERE stateStringId IN ?;
+
+selectConsentStringById:
+SELECT * FROM ConsentString WHERE consentStringId IN ?;

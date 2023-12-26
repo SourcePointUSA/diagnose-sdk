@@ -1,8 +1,8 @@
 package com.sourcepoint.diagnose
 
 interface VendorDatabaseLoader {
-    suspend fun loadLocalDatabase(): Result<VendorDatabase?>
-    suspend fun storeLocalDatabase(db: VendorDatabase): Result<Unit>
+    fun loadLocalDatabase(): VendorDatabase?
+    fun storeLocalDatabase(db: VendorDatabase)
 }
 
 interface VendorDatabase {
