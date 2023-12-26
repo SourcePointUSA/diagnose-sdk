@@ -78,11 +78,13 @@ SELECT * FROM Vendor;
 insertEvent:
 INSERT INTO EventV1 VALUES ?;
 
-getAllEventsForSend:
+getEventsOnOrBefore:
 SELECT
     *
 FROM
     EventV1
+WHERE
+    eventTime <= ?
 ORDER BY
     eventTime ASC;
 
@@ -90,7 +92,7 @@ clearEvents:
 DELETE FROM
     EventV1
 WHERE
-    eventTime < ?
+    eventTime <= ?
 AND
     eventTime NOT IN ?
 ;

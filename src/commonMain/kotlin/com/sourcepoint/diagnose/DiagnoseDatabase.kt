@@ -22,6 +22,7 @@ interface DiagnoseDatabase : VendorDatabaseLoader {
     fun setConsentString(timeNanos: Long, string: String)
     fun addUrlEvent(timeNanos: Long, vendorId: String, valid: Boolean, rejected: Boolean)
     fun getAllEventsForSend(): List<SendEvent>
+    fun clearOldEvents()
     fun unmarkSendEvents()
 }
 
@@ -36,6 +37,7 @@ class DiagnoseDatabaseImpl(driver: SqlDriver) : DiagnoseDatabase {
         val nanos = nowNanos()
         val row = Config(nanos, configVersion, config)
         queries.addConfig(row)
+        queries.clearOldConfigs()
     }
 
     private fun defaultConfig(): DiagnoseConfig {
@@ -86,7 +88,7 @@ class DiagnoseDatabaseImpl(driver: SqlDriver) : DiagnoseDatabase {
 
     override fun getAllEventsForSend(): List<SendEvent> {
         return storage.transactionWithResult {
-            val events = queries.getAllEventsForSend().executeAsList()
+            val events = queries.getEventsOnOrBefore(Long.MAX_VALUE).executeAsList()
             if (events.isEmpty()) {
                 listOf()
             } else {
@@ -128,8 +130,31 @@ class DiagnoseDatabaseImpl(driver: SqlDriver) : DiagnoseDatabase {
                 }
                 val config = getOrCreateConfig()
                 config.copy(eventMarker = eventMarker)
-                queries.addConfig(Config(nowNanos(), configVersion, config))
+                addConfig(config)
                 result
+            }
+        }
+    }
+
+    override fun clearOldEvents() {
+        storage.transaction {
+            val config = getOrCreateConfig()
+            val marker = config.eventMarker
+            if (marker != null) {
+                val events = queries.getEventsOnOrBefore(marker).executeAsList()
+                var latestConsentString = 0L
+                var latestStateString = 0L
+                for (event in events) {
+                    when (event.flags.type) {
+                        EventType.CONSENT_STRING -> latestConsentString = event.eventTime
+                        EventType.STATE -> latestStateString = event.eventTime
+                        else -> {}
+                    }
+                }
+                queries.clearEvents(marker, listOf(latestConsentString, latestStateString))
+                // clear event marker
+                config.copy(eventMarker = null)
+                addConfig(config)
             }
         }
     }
@@ -138,7 +163,7 @@ class DiagnoseDatabaseImpl(driver: SqlDriver) : DiagnoseDatabase {
         storage.transaction {
             val config = getOrCreateConfig()
             config.copy(eventMarker = null)
-            queries.addConfig(Config(nowNanos(), configVersion, config))
+            addConfig(config)
         }
     }
 

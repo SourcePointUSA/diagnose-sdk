@@ -110,7 +110,7 @@ class DiagnoseEventHandlerImpl(
                 valid = false
                 shouldReject = true
             }
-            // TODO checkblacklist
+            // TODO check consent string
             diagnoseDatabase.addUrlEvent(timeNanos, vendorId, valid = valid, rejected = shouldReject)
         } catch (e: Throwable) {
             logger.error(e) { "error on urlReceived" }
@@ -126,6 +126,8 @@ class DiagnoseEventHandlerImpl(
         try {
             val events = diagnoseDatabase.getAllEventsForSend()
             client.sendEvents(events)
+            diagnoseDatabase.clearOldEvents()
+            // TODO clear send events and periodically on startup
         } catch (e: Throwable) {
             logger.error(e) { "error dumping state" }
             try {
