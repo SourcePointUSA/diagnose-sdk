@@ -2,6 +2,6 @@
 
 to build
 ```bash
-gradle openApiGenerate
-gradle build
+./gradlew openApiGenerate
+./gradlew build
 ```

@@ -1,61 +1,44 @@
 package com.sourcepoint.diagnose
 
+import com.rickclephas.kmp.nativecoroutines.NativeCoroutines
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.*
 import kotlinx.atomicfu.locks.SynchronizedObject
 import kotlinx.atomicfu.locks.synchronized
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlin.random.Random
+import kotlin.time.ExperimentalTime
 import kotlin.time.TimeSource
 
+private val logger = KotlinLogging.logger {}
 
-sealed class Event {
-    data class ConsentStringEvent(
-        val timeNanos: Long, val consentString: String
-    ) : Event()
-
-    data class StateEvent(
-        val timeNanos: Long, val state: ImmutableList<String>
-    ) : Event()
-
-    data class UrlEvent(
-        val timeNanos: Long,
-        val vendorId: String,
-        val domain: String,
-        val url: String,
-        val method: String,
-        val headers: ImmutableList<Pair<String, String>>,
-    ) : Event()
-}
-
+// primary interface for clients
 interface DiagnoseEventHandler {
     // this will mark all incoming requests after this moment with this state
-    suspend fun setState(state: Collection<String>)
+    @NativeCoroutines
+    suspend fun setState(state: List<String>)
 
     // set current consent string
+    @NativeCoroutines
     suspend fun setConsentString(consentString: String)
 
+    @NativeCoroutines
     suspend fun urlReceived(url: String, method: String, headers: Collection<Pair<String, String>>): Boolean
 
     // TODO should this be in the api or just done in the background?
     // figure out if it's worth dumping the state and send it to the api
+    @NativeCoroutines
     suspend fun dumpState()
 }
 
-// want to use nanos for ordering of events in database
-fun epochNanos(instant: Instant): Long {
-    return instant.epochSeconds * 1_000_000_000 + instant.nanosecondsOfSecond
-}
-
 // this class takes all actions from the application
+@OptIn(ExperimentalTime::class)
 class DiagnoseEventHandlerImpl(
     private val samplePercentage: Double?,
     private val vendorDatabase: VendorDatabase,
     private val ignoreDomains: Set<String>,
     private val client: DiagnoseClient,
-    private val eventDatabase: EventDatabase
+    private val diagnoseDatabase: DiagnoseDatabase
 ) : DiagnoseEventHandler {
 
     private val start = Clock.System.now()
@@ -65,24 +48,24 @@ class DiagnoseEventHandlerImpl(
     private val mark = TimeSource.Monotonic.markNow()
     private val random = Random(epochNanos(start))
 
-    suspend fun <E : Event> mkEvent(f: (Long) -> E) {
-        val event = synchronized(lock) {
+    private fun getTimeNanos(): Long {
+        synchronized(lock) {
             val elapsed = mark.elapsedNow()
-            // TODO nanos
-            val timeNanos = epochNanos(start.plus(elapsed))
-            f(timeNanos)
+            return epochNanos(start.plus(elapsed))
         }
-        // TODO log error
-        eventDatabase.insertEvent(event)
     }
 
     // this will mark all incoming requests after this moment with this state
-    override suspend fun setState(state: Collection<String>) {
+    override suspend fun setState(state: List<String>) {
         if (samplePercentage == null) {
             return
         }
-        val stateImm = state.toImmutableList()
-        mkEvent { timeNanos: Long -> Event.StateEvent(timeNanos, stateImm) }
+        try {
+            val timeNanos = getTimeNanos()
+            diagnoseDatabase.setState(timeNanos, state)
+        } catch (e: Throwable) {
+            logger.error(e) { "error on urlReceived" }
+        }
     }
 
     // set current consent string
@@ -90,7 +73,12 @@ class DiagnoseEventHandlerImpl(
         if (samplePercentage == null) {
             return
         }
-        mkEvent { timeNanos: Long -> Event.ConsentStringEvent(timeNanos, consentString) }
+        try {
+            val timeNanos = getTimeNanos()
+            diagnoseDatabase.setConsentString(timeNanos, consentString)
+        } catch (e: Throwable) {
+            logger.error(e) { "error on urlReceived" }
+        }
     }
 
     override suspend fun urlReceived(
@@ -99,40 +87,33 @@ class DiagnoseEventHandlerImpl(
         headers: Collection<Pair<String, String>>
     ): Boolean {
         var shouldReject = false;
-        if (samplePercentage == null) {
-            return shouldReject
-        }
-        val drop = synchronized(lock) {
-            samplePercentage < random.nextDouble()
-        }
-        if (drop) {
-            return shouldReject
-        }
-        val parsed: Url
         try {
-            parsed = Url(url)
+            if (samplePercentage == null) {
+                return shouldReject
+            }
+            val drop = synchronized(lock) {
+                samplePercentage < random.nextDouble()
+            }
+            if (drop) {
+                return shouldReject
+            }
+            val parsed = Url(url)
+            val domain = parsed.host
+            if (ignoreDomains.contains(domain)) {
+                return shouldReject
+            }
+            val vendorId = vendorDatabase.getVendorId(domain) ?: return shouldReject
+            val timeNanos = getTimeNanos()
+            var valid = true
+            val config = diagnoseDatabase.getLatestConfig()
+            if (config.domainBlackList.contains(domain)) {
+                valid = false
+                shouldReject = true
+            }
+            // TODO checkblacklist
+            diagnoseDatabase.addUrlEvent(timeNanos, vendorId, valid = valid, rejected = shouldReject)
         } catch (e: Throwable) {
-            // TODO log
-            return shouldReject
-        }
-        val domain = parsed.host
-        if (ignoreDomains.contains(domain)) {
-            return shouldReject
-        }
-        val vendorId = vendorDatabase.getVendorId(domain)
-        if (vendorId == null) {
-            return shouldReject
-        }
-        val headersImm = headers.toImmutableList()
-        mkEvent { timeNanos: Long ->
-            Event.UrlEvent(
-                timeNanos,
-                vendorId,
-                domain,
-                url,
-                method,
-                headersImm
-            )
+            logger.error(e) { "error on urlReceived" }
         }
         // TODO determine whether this event needs to be rejected
         return shouldReject
@@ -143,17 +124,15 @@ class DiagnoseEventHandlerImpl(
         // TODO every x events or y seconds we will try to dump all the state
         //      otherwise bailout
         try {
-            val events = eventDatabase.getAllEventsForSend().getOrThrow()
-            try {
-                client.sendEvents(events).getOrThrow()
-            } catch (e: Throwable) {
-                // TODO log error
-                eventDatabase.unmarkSendEvents()
-                return
-            }
+            val events = diagnoseDatabase.getAllEventsForSend()
+            client.sendEvents(events)
         } catch (e: Throwable) {
-            // TODO log error
-            return
+            logger.error(e) { "error dumping state" }
+            try {
+                diagnoseDatabase.unmarkSendEvents()
+            } catch (e: Throwable) {
+                logger.error(e) { "error reverting state" }
+            }
         }
     }
 }

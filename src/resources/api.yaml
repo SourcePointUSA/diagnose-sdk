@@ -39,6 +39,12 @@ components:
   schemas:
     ClientConfig:
       type: object
+      required:
+        - version
+        - active
+        - samplePercentage
+        - dbVersion
+        - domainBlackList
       properties:
         version:
           type: string
@@ -48,8 +54,15 @@ components:
           type: number
         dbVersion:
           type: string
+        domainBlackList:
+          type: array
+          items:
+            type: string
     VendorDbLarge:
       type: object
+      required:
+        - version
+        - rows
       properties:
         version:
           type: string
@@ -59,6 +72,10 @@ components:
             $ref: "#/components/schemas/VendorDbRow"
     VendorDbRow:
       type: object
+      required:
+        - id
+        - domain
+        - kind
       properties:
         id:
           type: string
@@ -66,8 +83,14 @@ components:
           type: string
         kind:
           type: integer
+        iabId:
+          type: integer
     RecordEventsRequest:
       type: object
+      required:
+        - clientId
+        - appId
+        - eventsLarge
       properties:
         clientId:
           type: string
@@ -79,12 +102,20 @@ components:
             $ref: "#/components/schemas/EventLarge"
     EventLarge:
       type: object
+      required:
+        - ts
+        - domain
+        - valid
+        - blocked
+        - state
       properties:
         ts:
           type: number
         domain:
           type: string
         valid:
+          type: boolean
+        blocked:
           type: boolean
         state:
           type: array
