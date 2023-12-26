@@ -1,3 +1,4 @@
+import com.sourcepoint.diagnose.storage.StringList;
 import com.sourcepoint.diagnose.storage.EventFlags;
 import com.sourcepoint.diagnose.storage.DiagnoseConfig;
 
@@ -26,17 +27,15 @@ CREATE TABLE ConsentString (
 
 CREATE TABLE StateString (
   stateStringId INTEGER PRIMARY KEY NOT NULL,
-  kind INTEGER NOT NULL,
-  value TEXT NOT NULL,
-  UNIQUE(kind, value)
+  value TEXT AS StringList NOT NULL
 );
 
 CREATE TABLE EventV1 (
   eventTime INTEGER PRIMARY KEY NOT NULL,
   flags INTEGER AS EventFlags NOT NULL,
-  vendorId INTEGER NOT NULL,
-  consentStringId INTEGER NOT NULL,
-  stateStringId INTEGER NOT NULL,
+  vendorId TEXT,
+  consentStringId INTEGER,
+  stateStringId INTEGER,
   FOREIGN KEY(stateStringId) REFERENCES StateString(stateStringId),
   FOREIGN KEY(consentStringId) REFERENCES ConsentString(consentStringId),
   FOREIGN KEY(vendorId) REFERENCES Vendor(vendorId)
@@ -75,6 +74,9 @@ INSERT INTO Vendor VALUES ?;
 
 getVendorDatabase:
 SELECT * FROM Vendor;
+
+insertEvent:
+INSERT INTO EventV1 VALUES ?;
 
 getAllEventsForSend:
 SELECT

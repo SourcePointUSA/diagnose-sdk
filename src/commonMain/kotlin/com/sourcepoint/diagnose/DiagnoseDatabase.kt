@@ -2,7 +2,6 @@ package com.sourcepoint.diagnose
 
 import app.cash.sqldelight.db.SqlDriver
 import com.sourcepoint.diagnose.storage.*
-import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentSetOf
@@ -27,7 +26,7 @@ interface DiagnoseDatabase : VendorDatabaseLoader {
 }
 
 class DiagnoseDatabaseImpl(driver: SqlDriver) : DiagnoseDatabase {
-    private val storage = DiagnoseStorage.invoke(driver, mkConfigAdapter(), mkEventAdapter())
+    private val storage = DiagnoseStorage.invoke(driver, mkConfigAdapter(), mkEventAdapter(), mkStateStringAdapter())
     private val queries = storage.diagnoseStorageQueries
     private val configVersion = "1.0"
     private val defaultConfig = defaultConfig()
@@ -64,15 +63,25 @@ class DiagnoseDatabaseImpl(driver: SqlDriver) : DiagnoseDatabase {
     }
 
     override fun setState(timeNanos: Long, state: List<String>) {
-        TODO("Not yet implemented")
-    }
-
-    override fun addUrlEvent(timeNanos: Long, vendorId: String, valid: Boolean, rejected: Boolean) {
-        TODO("Not yet implemented")
+        // TODO getOrCreate state
+        val stateId = 0L
+        val flags = EventFlags(EventType.STATE, false, false)
+        val event = EventV1(timeNanos, flags, null, null, stateId)
+        queries.insertEvent(event)
     }
 
     override fun setConsentString(timeNanos: Long, string: String) {
-        TODO("Not yet implemented")
+        // TODO getOrCreate
+        val consentStringId = 0L
+        val flags = EventFlags(EventType.CONSENT_STRING, false, false)
+        val event = EventV1(timeNanos, flags, null, consentStringId, null)
+        queries.insertEvent(event)
+    }
+
+    override fun addUrlEvent(timeNanos: Long, vendorId: String, valid: Boolean, rejected: Boolean) {
+        val flags = EventFlags(EventType.URL, rejected = rejected, valid = valid)
+        val event = EventV1(timeNanos, flags, vendorId, null, null)
+        queries.insertEvent(event)
     }
 
     override fun getAllEventsForSend(): List<SendEvent> {
@@ -81,12 +90,46 @@ class DiagnoseDatabaseImpl(driver: SqlDriver) : DiagnoseDatabase {
             if (events.isEmpty()) {
                 listOf()
             } else {
+                val vendorIds = mutableSetOf<String>()
+                val stateStringIds = mutableSetOf<Long>()
+                for (event in events) {
+                    when (event.flags.type) {
+                        EventType.CONSENT_STRING -> continue
+                        EventType.STATE -> stateStringIds.add(event.stateStringId!!)
+                        EventType.URL -> vendorIds.add(event.vendorId!!)
+                    }
+                }
+                val stateMap = queries.selectStateStringById(stateStringIds).executeAsList()
+                    .map { it.stateStringId to it.value_ }.toMap()
+                val vendorMap = queries.selectVendorById(vendorIds).executeAsList()
+                    .map { it.vendorId to it }.toMap()
                 var eventMarker = 0L;
                 // set high water mark
+                val result = mutableListOf<SendEvent>()
+                var state = listOf<String>()
+                for (event in events) {
+                    eventMarker = event.eventTime
+                    when (event.flags.type) {
+                        EventType.CONSENT_STRING -> continue
+                        EventType.STATE -> state = stateMap[event.stateStringId!!]!!.value
+                        EventType.URL -> {
+                            val vendor = vendorMap.get(event.vendorId!!)!!
+                            val sendEvent = SendEvent(
+                                state,
+                                event.eventTime / 1000L,
+                                event.vendorId!!,
+                                vendor.domain,
+                                rejected = event.flags.rejected,
+                                valid = event.flags.valid
+                            )
+                            result.add(sendEvent)
+                        }
+                    }
+                }
                 val config = getOrCreateConfig()
                 config.copy(eventMarker = eventMarker)
                 queries.addConfig(Config(nowNanos(), configVersion, config))
-                listOf()
+                result
             }
         }
     }
