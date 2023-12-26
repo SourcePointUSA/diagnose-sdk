@@ -52,7 +52,7 @@ kotlin {
             executable("hello")
         }
     }
-    val libName = "DiagnoseSdk2"
+    val libName = "DiagnoseSdk"
     val xcf = XCFramework(libName)
     val iosTargets = listOf(iosArm64(), iosSimulatorArm64())
     iosTargets.forEach {

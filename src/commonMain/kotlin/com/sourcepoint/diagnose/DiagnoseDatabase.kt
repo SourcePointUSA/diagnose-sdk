@@ -2,6 +2,8 @@ package com.sourcepoint.diagnose
 
 import app.cash.sqldelight.db.SqlDriver
 import com.sourcepoint.diagnose.storage.*
+import kotlinx.atomicfu.AtomicRef
+import kotlinx.atomicfu.atomic
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentSetOf
 
@@ -28,6 +30,8 @@ class DiagnoseDatabaseImpl(driver: SqlDriver) : DiagnoseDatabase {
     private val storage = DiagnoseStorage.invoke(driver, mkConfigAdapter(), mkEventAdapter())
     private val queries = storage.diagnoseStorageQueries
     private val configVersion = "1.0"
+    private val defaultConfig = defaultConfig()
+    private val configCache = atomic(Pair(0L, defaultConfig))
 
     override fun addConfig(config: DiagnoseConfig) {
         val nanos = nowNanos()
@@ -40,8 +44,19 @@ class DiagnoseDatabaseImpl(driver: SqlDriver) : DiagnoseDatabase {
     }
 
     private fun getOrCreateConfig(): DiagnoseConfig {
-        val config = queries.getLatestConfig(configVersion).executeAsOneOrNull()
-        return config ?: defaultConfig()
+        val cached = configCache.value
+        val latestTime = queries.getLatestConfigTime(configVersion).executeAsOneOrNull()
+        if (latestTime == null) {
+            return cached.second
+        }
+        if (cached.first == latestTime.MAX) {
+            return cached.second
+        }
+        return storage.transactionWithResult {
+            val config = queries.getLatestConfig(configVersion).executeAsOne()
+            configCache.value = Pair(config.configTime, config.value_)
+            config.value_
+        }
     }
 
     override fun getLatestConfig(): DiagnoseConfig {

@@ -45,9 +45,17 @@ CREATE TABLE EventV1 (
 addConfig:
 INSERT INTO Config VALUES ?;
 
+getLatestConfigTime:
+SELECT
+    MAX(configTime)
+FROM
+    Config
+WHERE
+    version = ?;
+
 getLatestConfig:
 SELECT
-    value
+    *
 FROM
     Config
 WHERE

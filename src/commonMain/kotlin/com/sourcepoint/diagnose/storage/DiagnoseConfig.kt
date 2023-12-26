@@ -18,7 +18,7 @@ import kotlinx.serialization.json.Json
 @Serializable
 data class DiagnoseConfig(
     val samplePercentage: Double?,
-    @Serializable(with = ImmutableListSerializer::class)
+    @Serializable(with = ImmutableSetSerializer::class)
     val domainBlackList: ImmutableSet<String>,
     val eventMarker: Long?,
     val consentString: String?,
