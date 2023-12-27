@@ -11,3 +11,5 @@ replay_pid*
 .vscode/
 *.iml
 .idea/
+xcuserdata/
+project.xcworkspace/

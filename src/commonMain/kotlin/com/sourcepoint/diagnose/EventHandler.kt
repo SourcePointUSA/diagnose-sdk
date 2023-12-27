@@ -20,7 +20,7 @@ interface DiagnoseEventHandler {
     suspend fun setConsentString(consentString: String)
 
     @NativeCoroutines
-    suspend fun urlReceived(url: String, method: String, headers: Collection<Pair<String, String>>): Boolean
+    suspend fun urlReceived(url: String, method: String, headers: List<Pair<String, String>>): Boolean
 
     // TODO should this be in the api or just done in the background?
     // figure out if it's worth dumping the state and send it to the api
@@ -74,7 +74,7 @@ class DiagnoseEventHandlerImpl(
     override suspend fun urlReceived(
         url: String,
         method: String,
-        headers: Collection<Pair<String, String>>
+        headers: List<Pair<String, String>>
     ): Boolean {
         var shouldReject = false
         try {

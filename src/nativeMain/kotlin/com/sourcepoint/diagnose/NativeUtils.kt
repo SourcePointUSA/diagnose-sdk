@@ -106,7 +106,7 @@ class NullConsentManager : ConsentManager {
 }
 
 class NullEventHandler : DiagnoseEventHandler {
-    override suspend fun urlReceived(url: String, method: String, headers: Collection<Pair<String, String>>): Boolean {
+    override suspend fun urlReceived(url: String, method: String, headers: List<Pair<String, String>>): Boolean {
         return false
     }
 
