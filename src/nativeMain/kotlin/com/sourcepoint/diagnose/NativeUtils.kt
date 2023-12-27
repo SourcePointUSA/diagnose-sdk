@@ -12,11 +12,11 @@ private const val badVersion = "000"
 private val logger = KotlinLogging.logger {}
 
 private suspend fun loadConfigOrDefault(client: DiagnoseClient): ClientConfig {
-    try {
-        return client.getConfig()
+    return try {
+        client.getConfig()
     } catch (e: Throwable) {
         logger.error(e) { "error loading config" }
-        return ClientConfig(badVersion, false, 0.0, badVersion, listOf())
+        ClientConfig(badVersion, false, 0.0, badVersion, listOf())
     }
 }
 

@@ -8,7 +8,7 @@ import kotlin.test.assertContentEquals
 
 class StateStringTests {
 
-    fun check(value: List<String>) {
+    private fun check(value: List<String>) {
         val adapter = mkStateStringAdapter()
         val stringList = StringList(value.toImmutableList())
         val encoded = adapter.value_Adapter.encode(stringList)

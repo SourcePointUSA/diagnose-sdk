@@ -102,11 +102,10 @@ class DiagnoseDatabaseImpl(driver: SqlDriver, private val monotonicClock: Monoto
                     }
                 }
                 val stateMap = queries.selectStateStringById(stateStringIds).executeAsList()
-                    .map { it.stateStringId to it.value_ }.toMap()
-                val vendorMap = queries.selectVendorById(vendorIds).executeAsList()
-                    .map { it.vendorId to it }.toMap()
-                var eventMarker = 0L;
-                // set high water mark
+                    .associate { it.stateStringId to it.value_ }
+                val vendorMap = queries.selectVendorById(vendorIds).executeAsList().associateBy { it.vendorId }
+                var eventMarker = 0L
+                // set high watermark
                 val result = mutableListOf<SendEvent>()
                 var state = listOf<String>()
                 for (event in events) {
@@ -115,11 +114,11 @@ class DiagnoseDatabaseImpl(driver: SqlDriver, private val monotonicClock: Monoto
                         EventType.CONSENT_STRING -> continue
                         EventType.STATE -> state = stateMap[event.stateStringId!!]!!.value
                         EventType.URL -> {
-                            val vendor = vendorMap.get(event.vendorId!!)!!
+                            val vendor = vendorMap[event.vendorId!!]!!
                             val sendEvent = SendEvent(
                                 state,
                                 event.eventTime / 1000L,
-                                event.vendorId!!,
+                                event.vendorId,
                                 vendor.domain,
                                 rejected = event.flags.rejected,
                                 valid = event.flags.valid
@@ -166,7 +165,7 @@ class DiagnoseDatabaseImpl(driver: SqlDriver, private val monotonicClock: Monoto
         }
     }
 
-    override fun loadLocalDatabase(): VendorDatabase? {
+    override fun loadLocalDatabase(): VendorDatabase {
         val vendors = queries.getVendorDatabase().executeAsList()
         val entries = ArrayList<VendorData>()
         for (vendor in vendors) {

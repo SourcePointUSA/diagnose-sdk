@@ -8,7 +8,7 @@ import kotlin.test.assertNull
 
 class VendorDatabaseTests {
 
-    fun mkDatabase(vendorDb: VendorDatabase): DiagnoseDatabase {
+    private fun mkDatabase(vendorDb: VendorDatabase): DiagnoseDatabase {
         val schema = DiagnoseStorage.Schema
         val driver = inMemoryDriver(schema)
         val clock = MonotonicClockImpl()
@@ -17,7 +17,7 @@ class VendorDatabaseTests {
         return db
     }
 
-    fun mkVendorDb(): VendorDatabase {
+    private fun mkVendorDb(): VendorDatabase {
         val data = listOf(
             VendorData("1", "d1.com", null),
             VendorData("2", "d2.com", null),

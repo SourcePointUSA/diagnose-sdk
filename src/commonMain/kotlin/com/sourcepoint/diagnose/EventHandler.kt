@@ -74,7 +74,7 @@ class DiagnoseEventHandlerImpl(
         method: String,
         headers: Collection<Pair<String, String>>
     ): Boolean {
-        var shouldReject = false;
+        var shouldReject = false
         try {
             if (samplePercentage == null) {
                 return shouldReject

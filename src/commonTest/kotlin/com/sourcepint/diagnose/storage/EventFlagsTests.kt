@@ -8,9 +8,9 @@ import kotlin.test.assertEquals
 
 class EventFlagsTests {
 
-    fun checkEncode(flags: EventFlags) {
+    private fun checkEncode(flags: EventFlags) {
         val adapter = mkEventAdapter()
-        var encoded = adapter.flagsAdapter.encode(flags)
+        val encoded = adapter.flagsAdapter.encode(flags)
         val decoded = adapter.flagsAdapter.decode(encoded)
         assertEquals(flags, decoded)
     }

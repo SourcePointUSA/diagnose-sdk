@@ -17,7 +17,7 @@ interface VendorDatabase {
 data class VendorData(val vendorId: String, val domain: String, val iabId: Int?)
 
 class VendorDatabaseImpl(override val version: String, entries: Collection<VendorData>) : VendorDatabase {
-    private val map = entries.map { it.domain to it }.toMap()
+    private val map = entries.associateBy { it.domain }
 
     override fun getVendorId(domain: String): String? {
         return map[domain]?.vendorId

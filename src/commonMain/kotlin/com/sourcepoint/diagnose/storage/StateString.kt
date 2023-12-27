@@ -22,6 +22,6 @@ private class StringListAdapter : ColumnAdapter<StringList, String> {
 
     override fun encode(value: StringList): String {
         // TODO escape commas
-        return value.value.map { it.trim() }.joinToString(",")
+        return value.value.joinToString(",") { it.trim() }
     }
 }
