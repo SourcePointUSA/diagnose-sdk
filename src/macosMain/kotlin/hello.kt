@@ -6,7 +6,6 @@ import com.sourcepoint.diagnose.MonotonicClockImpl
 import com.sourcepoint.diagnose.storage.DiagnoseConfig
 import com.sourcepoint.diagnose.storage.DiagnoseStorage
 import io.github.oshai.kotlinlogging.KotlinLogging
-import io.github.oshai.kotlinlogging.KotlinLoggingConfiguration
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.coroutines.runBlocking

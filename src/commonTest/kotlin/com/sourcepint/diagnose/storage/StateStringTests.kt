@@ -2,11 +2,9 @@ package com.sourcepint.diagnose.storage
 
 import com.sourcepoint.diagnose.storage.StringList
 import com.sourcepoint.diagnose.storage.mkStateStringAdapter
-import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
-import kotlin.test.assertEquals
 
 class StateStringTests {
 

@@ -140,7 +140,7 @@ paths:
       operationId: getConfig
       description: get session config
       security:
-        - ApiKeyAuth: []
+        - ApiKeyAuth: [ ]
       parameters:
         - name: clientId
           in: path
@@ -173,7 +173,7 @@ paths:
       operationId: getDbLarge
       description: get current vendor db
       security:
-        - ApiKeyAuth: []
+        - ApiKeyAuth: [ ]
       responses:
         "200":
           description: OK
@@ -190,7 +190,7 @@ paths:
       operationId: recordEvents
       description: record a series of events
       security:
-        - ApiKeyAuth: []
+        - ApiKeyAuth: [ ]
       requestBody:
         required: true
         content:
@@ -210,4 +210,4 @@ paths:
           $ref: '#/components/responses/UnexpectedError'
 
 security:
-  - ApiKeyAuth: []
+  - ApiKeyAuth: [ ]

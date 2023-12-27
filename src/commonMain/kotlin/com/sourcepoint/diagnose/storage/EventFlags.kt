@@ -1,7 +1,6 @@
 package com.sourcepoint.diagnose.storage
 
 import app.cash.sqldelight.ColumnAdapter
-import com.sourcepoint.diagnose.storage.EventV1
 
 // NB: don't change order as we use ordinal
 enum class EventType {
