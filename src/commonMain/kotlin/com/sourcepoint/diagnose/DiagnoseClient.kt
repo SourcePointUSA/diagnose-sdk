@@ -46,7 +46,7 @@ private fun convertDb(db: VendorDbLarge): VendorDatabase {
     if (version.isEmpty()) {
         throw RuntimeException("empty version")
     }
-    val map = HashMap<String, String>()
+    val entries = ArrayList<VendorData>()
     for (row in db.rows) {
         val id = row.id
         val domain = row.domain
@@ -55,9 +55,11 @@ private fun convertDb(db: VendorDbLarge): VendorDatabase {
             // TODO return error on bad row?
             continue
         }
-        map[domain] = id
+        // TODO get from client
+        val iabId: Int? = null
+        entries.add(VendorData(id, domain, iabId))
     }
-    return VendorDatabaseImpl(version, map)
+    return VendorDatabaseImpl(version, entries)
 }
 
 private fun convertEvents(events: List<SendEvent>): List<EventLarge> {

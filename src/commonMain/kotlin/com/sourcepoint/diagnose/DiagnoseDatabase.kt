@@ -5,6 +5,7 @@ import com.sourcepoint.diagnose.storage.*
 import kotlinx.atomicfu.atomic
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentSetOf
+import kotlinx.collections.immutable.toImmutableList
 
 data class SendEvent(
     val state: List<String>,
@@ -26,7 +27,7 @@ interface DiagnoseDatabase : VendorDatabaseLoader {
     fun unmarkSendEvents()
 }
 
-class DiagnoseDatabaseImpl(driver: SqlDriver) : DiagnoseDatabase {
+class DiagnoseDatabaseImpl(driver: SqlDriver, private val monotonicClock: MonotonicClock) : DiagnoseDatabase {
     private val storage = DiagnoseStorage.invoke(driver, mkConfigAdapter(), mkEventAdapter(), mkStateStringAdapter())
     private val queries = storage.diagnoseStorageQueries
     private val configVersion = "1.0"
@@ -34,7 +35,7 @@ class DiagnoseDatabaseImpl(driver: SqlDriver) : DiagnoseDatabase {
     private val configCache = atomic(Pair(0L, defaultConfig))
 
     override fun addConfig(config: DiagnoseConfig) {
-        val nanos = nowNanos()
+        val nanos = monotonicClock.nowNanos()
         val row = Config(nanos, configVersion, config)
         queries.addConfig(row)
         queries.clearOldConfigs()
@@ -46,8 +47,8 @@ class DiagnoseDatabaseImpl(driver: SqlDriver) : DiagnoseDatabase {
 
     private fun getOrCreateConfig(): DiagnoseConfig {
         val cached = configCache.value
-        val latestTime = queries.getLatestConfigTime(configVersion).executeAsOneOrNull()
-        if (latestTime == null) {
+        val latestTime = queries.getLatestConfigTime(configVersion).executeAsOne()
+        if (latestTime.MAX == null) {
             return cached.second
         }
         if (cached.first == latestTime.MAX) {
@@ -65,16 +66,15 @@ class DiagnoseDatabaseImpl(driver: SqlDriver) : DiagnoseDatabase {
     }
 
     override fun setState(timeNanos: Long, state: List<String>) {
-        // TODO getOrCreate state
-        val stateId = 0L
+        val wrapper = StringList(state.toImmutableList())
+        val stateId = queries.upsertStateString(StateString(timeNanos, wrapper)).executeAsOne()
         val flags = EventFlags(EventType.STATE, false, false)
         val event = EventV1(timeNanos, flags, null, null, stateId)
         queries.insertEvent(event)
     }
 
     override fun setConsentString(timeNanos: Long, string: String) {
-        // TODO getOrCreate
-        val consentStringId = 0L
+        val consentStringId = queries.upsertConsentString(ConsentString(timeNanos, 1L, string)).executeAsOne()
         val flags = EventFlags(EventType.CONSENT_STRING, false, false)
         val event = EventV1(timeNanos, flags, null, consentStringId, null)
         queries.insertEvent(event)
@@ -128,8 +128,7 @@ class DiagnoseDatabaseImpl(driver: SqlDriver) : DiagnoseDatabase {
                         }
                     }
                 }
-                val config = getOrCreateConfig()
-                config.copy(eventMarker = eventMarker)
+                val config = getOrCreateConfig().copy(eventMarker = eventMarker)
                 addConfig(config)
                 result
             }
@@ -152,33 +151,43 @@ class DiagnoseDatabaseImpl(driver: SqlDriver) : DiagnoseDatabase {
                     }
                 }
                 queries.clearEvents(marker, listOf(latestConsentString, latestStateString))
+                queries.clearUnusedConsentStrings()
+                queries.clearUnusedStates()
                 // clear event marker
-                config.copy(eventMarker = null)
-                addConfig(config)
+                addConfig(config.copy(eventMarker = null))
             }
         }
     }
 
     override fun unmarkSendEvents() {
         storage.transaction {
-            val config = getOrCreateConfig()
-            config.copy(eventMarker = null)
+            val config = getOrCreateConfig().copy(eventMarker = null)
             addConfig(config)
         }
     }
 
     override fun loadLocalDatabase(): VendorDatabase? {
         val vendors = queries.getVendorDatabase().executeAsList()
-        val map = HashMap<String, String>()
+        val entries = ArrayList<VendorData>()
         for (vendor in vendors) {
-            map[vendor.domain] = vendor.vendorId
+            entries.add(VendorData(vendor.vendorId, vendor.domain, vendor.iabId?.toInt()))
         }
         // TODO get from config
         val version = "1.0"
-        return VendorDatabaseImpl(version, map)
+        return VendorDatabaseImpl(version, entries)
     }
 
     // TODO insert from high water mark
     override fun storeLocalDatabase(db: VendorDatabase) {
+        db.export { domain: String, vendorId: String, iabId: Int? ->
+            queries.insertVendor(
+                Vendor(
+                    vendorId,
+                    1L,
+                    domain,
+                    iabId?.toLong()
+                )
+            )
+        }
     }
 }

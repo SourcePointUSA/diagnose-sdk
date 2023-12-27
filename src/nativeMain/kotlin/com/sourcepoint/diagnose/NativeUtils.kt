@@ -26,7 +26,7 @@ suspend fun loadDatabase(
     loader: VendorDatabaseLoader
 ): VendorDatabase {
     // start with empty db
-    var db: VendorDatabase = VendorDatabaseImpl(badVersion, HashMap())
+    var db: VendorDatabase = VendorDatabaseImpl(badVersion, listOf())
     // check local store
     try {
         val localDb = loader.loadLocalDatabase()
@@ -70,11 +70,12 @@ suspend fun mkDefaultEventHandler(
         }
         val client = DiagnoseClientImpl(api, clientId, appId, regionId)
         val config = loadConfigOrDefault(client)
-        val diagnoseDatabase = DiagnoseDatabaseImpl(driver)
+        val clock = MonotonicClockImpl()
+        val diagnoseDatabase = DiagnoseDatabaseImpl(driver, clock)
         val vendorDatabase = loadDatabase(config, client, diagnoseDatabase)
         // TODO get from config
         val samplePercentage = 0.5
-        return DiagnoseEventHandlerImpl(samplePercentage, vendorDatabase, setOf(), client, diagnoseDatabase)
+        return DiagnoseEventHandlerImpl(samplePercentage, vendorDatabase, setOf(), client, diagnoseDatabase, clock)
     } catch (e: Throwable) {
         // TODO log errors
         return NullEventHandler()

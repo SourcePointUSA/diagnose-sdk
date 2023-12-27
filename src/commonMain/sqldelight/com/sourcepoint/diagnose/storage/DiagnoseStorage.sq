@@ -27,7 +27,7 @@ CREATE TABLE ConsentString (
 
 CREATE TABLE StateString (
   stateStringId INTEGER PRIMARY KEY NOT NULL,
-  value TEXT AS StringList NOT NULL
+  value TEXT AS StringList NOT NULL UNIQUE
 );
 
 CREATE TABLE EventV1 (
@@ -70,7 +70,12 @@ WHERE
 ;
 
 insertVendor:
-INSERT INTO Vendor VALUES ?;
+INSERT INTO Vendor
+VALUES ?
+ON CONFLICT(vendorId) DO UPDATE
+SET domain = excluded.domain,
+    iabId = excluded.iabId
+;
 
 getVendorDatabase:
 SELECT * FROM Vendor;
@@ -97,11 +102,35 @@ AND
     eventTime NOT IN ?
 ;
 
+clearUnusedStates:
+DELETE FROM StateString
+WHERE stateStringId NOT IN (SELECT stateStringId FROM EventV1);
+
+clearUnusedConsentStrings:
+DELETE FROM ConsentString
+WHERE consentStringId NOT IN (SELECT consentStringId FROM EventV1);
+
 selectVendorById:
 SELECT * FROM Vendor WHERE vendorId IN ?;
 
 selectStateStringById:
 SELECT * FROM StateString WHERE stateStringId IN ?;
+
+upsertStateString:
+INSERT INTO StateString
+VALUES ?
+ON CONFLICT(value) DO UPDATE
+SET stateStringId = stateStringId
+RETURNING stateStringId
+;
+
+upsertConsentString:
+INSERT INTO ConsentString
+VALUES ?
+ON CONFLICT(kind, value) DO UPDATE
+SET consentStringId = consentStringId
+RETURNING consentStringId
+;
 
 selectConsentStringById:
 SELECT * FROM ConsentString WHERE consentStringId IN ?;

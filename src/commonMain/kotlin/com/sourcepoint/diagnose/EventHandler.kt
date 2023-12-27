@@ -32,36 +32,27 @@ interface DiagnoseEventHandler {
 }
 
 // this class takes all actions from the application
-@OptIn(ExperimentalTime::class)
 class DiagnoseEventHandlerImpl(
     private val samplePercentage: Double?,
     private val vendorDatabase: VendorDatabase,
     private val ignoreDomains: Set<String>,
     private val client: DiagnoseClient,
-    private val diagnoseDatabase: DiagnoseDatabase
+    private val diagnoseDatabase: DiagnoseDatabase,
+    private val monotonicClock: MonotonicClock,
 ) : DiagnoseEventHandler {
 
-    private val start = Clock.System.now()
     private val lock = SynchronizedObject()
 
     // mutable state guarded by lock
-    private val mark = TimeSource.Monotonic.markNow()
-    private val random = Random(epochNanos(start))
-
-    private fun getTimeNanos(): Long {
-        synchronized(lock) {
-            val elapsed = mark.elapsedNow()
-            return epochNanos(start.plus(elapsed))
-        }
-    }
+    private val random = Random(monotonicClock.nowNanos())
 
     // this will mark all incoming requests after this moment with this state
     override suspend fun setState(state: List<String>) {
-        if (samplePercentage == null) {
-            return
-        }
         try {
-            val timeNanos = getTimeNanos()
+            if (samplePercentage == null) {
+                return
+            }
+            val timeNanos = monotonicClock.nowNanos()
             diagnoseDatabase.setState(timeNanos, state)
         } catch (e: Throwable) {
             logger.error(e) { "error on urlReceived" }
@@ -70,11 +61,11 @@ class DiagnoseEventHandlerImpl(
 
     // set current consent string
     override suspend fun setConsentString(consentString: String) {
-        if (samplePercentage == null) {
-            return
-        }
         try {
-            val timeNanos = getTimeNanos()
+            if (samplePercentage == null) {
+                return
+            }
+            val timeNanos = monotonicClock.nowNanos()
             diagnoseDatabase.setConsentString(timeNanos, consentString)
         } catch (e: Throwable) {
             logger.error(e) { "error on urlReceived" }
@@ -103,7 +94,7 @@ class DiagnoseEventHandlerImpl(
                 return shouldReject
             }
             val vendorId = vendorDatabase.getVendorId(domain) ?: return shouldReject
-            val timeNanos = getTimeNanos()
+            val timeNanos = monotonicClock.nowNanos()
             var valid = true
             val config = diagnoseDatabase.getLatestConfig()
             if (config.domainBlackList.contains(domain)) {
@@ -115,7 +106,6 @@ class DiagnoseEventHandlerImpl(
         } catch (e: Throwable) {
             logger.error(e) { "error on urlReceived" }
         }
-        // TODO determine whether this event needs to be rejected
         return shouldReject
     }
 
