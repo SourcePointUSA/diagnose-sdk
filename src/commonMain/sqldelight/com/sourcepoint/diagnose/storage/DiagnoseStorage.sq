@@ -134,3 +134,37 @@ RETURNING consentStringId
 
 selectConsentStringById:
 SELECT * FROM ConsentString WHERE consentStringId IN ?;
+
+selectLatestConsentString:
+SELECT
+    value
+FROM
+    ConsentString
+WHERE consentStringId IN (
+    SELECT
+        consentStringId
+    FROM
+        EventV1
+    WHERE
+        consentStringId IS NOT NULL
+    ORDER BY
+        eventTime DESC
+    LIMIT 1
+);
+
+selectLatestStateString:
+SELECT
+    value
+FROM
+    StateString
+WHERE stateStringId IN (
+    SELECT
+        stateStringId
+    FROM
+        EventV1
+    WHERE
+        stateStringId IS NOT NULL
+    ORDER BY
+        eventTime DESC
+    LIMIT 1
+);

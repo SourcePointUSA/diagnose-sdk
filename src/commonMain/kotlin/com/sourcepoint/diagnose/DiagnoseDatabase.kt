@@ -35,6 +35,16 @@ class DiagnoseDatabaseImpl(driver: SqlDriver, private val monotonicClock: Monoto
     private val defaultConfig = defaultConfig()
     private val configCache = atomic(Pair(0L, defaultConfig))
 
+    init {
+        // init state
+        var config = getOrCreateConfig()
+        val consentString = queries.selectLatestConsentString().executeAsOneOrNull()
+        config = config.copy(consentString = consentString)
+        val state = queries.selectLatestStateString().executeAsOneOrNull()
+        config = config.copy(clientState = state?.value ?: persistentListOf())
+        addConfig(config)
+    }
+
     override fun addConfig(config: DiagnoseConfig) {
         val nanos = monotonicClock.nowNanos()
         val row = Config(nanos, configVersion, config)
