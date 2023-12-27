@@ -42,7 +42,7 @@ class DiagnoseDatabaseImpl(driver: SqlDriver, private val monotonicClock: Monoto
     }
 
     private fun defaultConfig(): DiagnoseConfig {
-        return DiagnoseConfig(null, persistentSetOf(), null, null, persistentListOf())
+        return DiagnoseConfig("000", null, persistentSetOf(), null, null, persistentListOf())
     }
 
     private fun getOrCreateConfig(): DiagnoseConfig {
@@ -166,27 +166,34 @@ class DiagnoseDatabaseImpl(driver: SqlDriver, private val monotonicClock: Monoto
     }
 
     override fun loadLocalDatabase(): VendorDatabase {
-        val vendors = queries.getVendorDatabase().executeAsList()
+        val (version, vendors) = storage.transactionWithResult {
+            val vendors = queries.getVendorDatabase().executeAsList()
+            val config = getOrCreateConfig()
+            Pair(config.databaseVersion, vendors)
+        }
         val entries = ArrayList<VendorData>()
         for (vendor in vendors) {
             entries.add(VendorData(vendor.vendorId, vendor.domain, vendor.iabId?.toInt()))
         }
-        // TODO get from config
-        val version = "1.0"
         return VendorDatabaseImpl(version, entries)
     }
 
-    // TODO insert from high water mark
+    // TODO insert from high watermark
+    // TODO this will fail if there are updates to domain
     override fun storeLocalDatabase(db: VendorDatabase) {
-        db.export { domain: String, vendorId: String, iabId: Int? ->
-            queries.insertVendor(
-                Vendor(
-                    vendorId,
-                    1L,
-                    domain,
-                    iabId?.toLong()
+        storage.transactionWithResult {
+            db.export { domain: String, vendorId: String, iabId: Int? ->
+                queries.insertVendor(
+                    Vendor(
+                        vendorId,
+                        1L,
+                        domain,
+                        iabId?.toLong()
+                    )
                 )
-            )
+            }
         }
+        val config = getOrCreateConfig().copy(databaseVersion = db.version)
+        addConfig(config)
     }
 }

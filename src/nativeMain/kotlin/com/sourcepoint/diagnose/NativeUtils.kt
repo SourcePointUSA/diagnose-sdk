@@ -73,12 +73,25 @@ suspend fun mkDefaultEventHandler(
         val clock = MonotonicClockImpl()
         val diagnoseDatabase = DiagnoseDatabaseImpl(driver, clock)
         val vendorDatabase = loadDatabase(config, client, diagnoseDatabase)
-        // TODO get from config
-        val samplePercentage = 0.5
-        return DiagnoseEventHandlerImpl(samplePercentage, vendorDatabase, setOf(), client, diagnoseDatabase, clock)
+        // TODO need a way to evaluate tcf strings in swift or natively in kotlin
+        val consentManager = NullConsentManager()
+        return DiagnoseEventHandlerImpl(
+            vendorDatabase,
+            setOf(),
+            client,
+            diagnoseDatabase,
+            clock,
+            consentManager
+        )
     } catch (e: Throwable) {
         // TODO log errors
         return NullEventHandler()
+    }
+}
+
+class NullConsentManager : ConsentManager {
+    override fun isIabConsented(iabId: Int, consentString: String): Boolean {
+        return false
     }
 }
 

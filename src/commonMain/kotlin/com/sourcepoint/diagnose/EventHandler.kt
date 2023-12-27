@@ -28,16 +28,18 @@ interface DiagnoseEventHandler {
     suspend fun dumpState()
 }
 
+// TODO clear send events on startup and periodically if that are not sent
 // this class takes all actions from the application
 class DiagnoseEventHandlerImpl(
-    private val samplePercentage: Double?,
     private val vendorDatabase: VendorDatabase,
     private val ignoreDomains: Set<String>,
     private val client: DiagnoseClient,
     private val diagnoseDatabase: DiagnoseDatabase,
     private val monotonicClock: MonotonicClock,
+    private val consentManager: ConsentManager,
 ) : DiagnoseEventHandler {
 
+    private val samplePercentage = diagnoseDatabase.getLatestConfig().samplePercentage
     private val lock = SynchronizedObject()
 
     // mutable state guarded by lock
@@ -90,16 +92,18 @@ class DiagnoseEventHandlerImpl(
             if (ignoreDomains.contains(domain)) {
                 return shouldReject
             }
-            val vendorId = vendorDatabase.getVendorId(domain) ?: return shouldReject
+            val vendor = vendorDatabase.getVendorData(domain) ?: return shouldReject
             val timeNanos = monotonicClock.nowNanos()
             var valid = true
             val config = diagnoseDatabase.getLatestConfig()
             if (config.domainBlackList.contains(domain)) {
                 valid = false
                 shouldReject = true
+            } else if (vendor.iabId != null && config.consentString != null) {
+                valid = consentManager.isIabConsented(vendor.iabId, config.consentString)
+                // TODO need to configure if invalid vendors should be rejected here
             }
-            // TODO check consent string
-            diagnoseDatabase.addUrlEvent(timeNanos, vendorId, valid = valid, rejected = shouldReject)
+            diagnoseDatabase.addUrlEvent(timeNanos, vendor.vendorId, valid = valid, rejected = shouldReject)
         } catch (e: Throwable) {
             logger.error(e) { "error on urlReceived" }
         }
@@ -114,7 +118,6 @@ class DiagnoseEventHandlerImpl(
             val events = diagnoseDatabase.getAllEventsForSend()
             client.sendEvents(events)
             diagnoseDatabase.clearOldEvents()
-            // TODO clear send events and periodically on startup
         } catch (e: Throwable) {
             logger.error(e) { "error dumping state" }
             try {

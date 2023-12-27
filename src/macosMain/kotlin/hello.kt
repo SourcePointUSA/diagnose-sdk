@@ -18,7 +18,7 @@ fun main() {
         val driver: SqlDriver = inMemoryDriver(DiagnoseStorage.Schema)
         val clock = MonotonicClockImpl()
         val db: DiagnoseDatabase = DiagnoseDatabaseImpl(driver, clock)
-        val config = DiagnoseConfig(0.5, persistentSetOf("test.com"), null, null, persistentListOf())
+        val config = DiagnoseConfig("0.5", null, persistentSetOf("test.com"), null, null, persistentListOf())
         db.addConfig(config)
         val latestConfig = db.getLatestConfig()
         println(latestConfig)
