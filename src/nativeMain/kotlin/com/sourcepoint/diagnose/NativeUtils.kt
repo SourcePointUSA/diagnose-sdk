@@ -7,16 +7,17 @@ import com.sourcepoint.api.v1.api.DefaultApi
 import com.sourcepoint.api.v1.model.ClientConfig
 import com.sourcepoint.diagnose.storage.DiagnoseStorage
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.collections.immutable.toImmutableSet
 
 private const val badVersion = "000"
 private val logger = KotlinLogging.logger {}
 
-private suspend fun loadConfigOrDefault(client: DiagnoseClient): ClientConfig {
+private suspend fun loadConfigOrDefault(client: DiagnoseClient): Pair<Boolean, ClientConfig> {
     return try {
-        client.getConfig()
+        Pair(true, client.getConfig())
     } catch (e: Throwable) {
         logger.error(e) { "error loading config" }
-        ClientConfig(badVersion, false, 0.0, badVersion, listOf())
+        Pair(false, ClientConfig(badVersion, false, 0.0, badVersion, listOf()))
     }
 }
 
@@ -59,6 +60,7 @@ suspend fun mkDefaultEventHandler(
     appId: String,
     // TODO make regionId optional
     regionId: String,
+    ignoredDomains: List<String>,
 ): DiagnoseEventHandler {
     try {
         val api = DefaultApi(apiUrl)
@@ -69,22 +71,30 @@ suspend fun mkDefaultEventHandler(
             NativeSqliteDriver(schema, databaseName)
         }
         val client = DiagnoseClientImpl(api, clientId, appId, regionId)
-        val config = loadConfigOrDefault(client)
+        val (loaded, config) = loadConfigOrDefault(client)
         val clock = MonotonicClockImpl()
         val diagnoseDatabase = DiagnoseDatabaseImpl(driver, clock)
+        if (loaded) {
+            val updatedConfig = diagnoseDatabase.getLatestConfig()
+                .copy(
+                    samplePercentage = config.samplePercentage,
+                    domainBlackList = config.domainBlackList.toImmutableSet()
+                )
+            diagnoseDatabase.addConfig(updatedConfig)
+        }
         val vendorDatabase = loadDatabase(config, client, diagnoseDatabase)
         // TODO need a way to evaluate tcf strings in swift or natively in kotlin
         val consentManager = NullConsentManager()
         return DiagnoseEventHandlerImpl(
             vendorDatabase,
-            setOf(),
+            ignoredDomains.toSet(),
             client,
             diagnoseDatabase,
             clock,
             consentManager
         )
     } catch (e: Throwable) {
-        // TODO log errors
+        logger.error(e) { "error initializing event handler" }
         return NullEventHandler()
     }
 }
@@ -104,10 +114,8 @@ class NullEventHandler : DiagnoseEventHandler {
     }
 
     override suspend fun setState(state: List<String>) {
-
     }
 
     override suspend fun dumpState() {
-
     }
 }

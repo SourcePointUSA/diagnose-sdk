@@ -27,7 +27,8 @@ interface DiagnoseDatabase : VendorDatabaseLoader {
     fun unmarkSendEvents()
 }
 
-class DiagnoseDatabaseImpl(driver: SqlDriver, private val monotonicClock: MonotonicClock) : DiagnoseDatabase {
+class DiagnoseDatabaseImpl(driver: SqlDriver, private val monotonicClock: MonotonicClock) :
+    DiagnoseDatabase {
     private val storage = DiagnoseStorage.invoke(driver, mkConfigAdapter(), mkEventAdapter(), mkStateStringAdapter())
     private val queries = storage.diagnoseStorageQueries
     private val configVersion = "1.0"

@@ -55,8 +55,7 @@ private fun convertDb(db: VendorDbLarge): VendorDatabase {
             // TODO return error on bad row?
             continue
         }
-        // TODO get from client
-        val iabId: Int? = null
+        val iabId = row.iabId
         entries.add(VendorData(id, domain, iabId))
     }
     return VendorDatabaseImpl(version, entries)
