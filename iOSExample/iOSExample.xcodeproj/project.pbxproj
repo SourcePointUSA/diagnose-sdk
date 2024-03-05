@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		822CF4022B9790D300927247 /* SPDiagnoseConfig.plist in Resources */ = {isa = PBXBuildFile; fileRef = 822CF4012B9790D300927247 /* SPDiagnoseConfig.plist */; };
+		822CF4042B97943B00927247 /* SPDiagnoseConfig.example.plist in Resources */ = {isa = PBXBuildFile; fileRef = 822CF4032B97943B00927247 /* SPDiagnoseConfig.example.plist */; };
 		827B61D02B7E696700F2CB68 /* iOSExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 827B61CF2B7E696700F2CB68 /* iOSExampleApp.swift */; };
 		827B61D22B7E696700F2CB68 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 827B61D12B7E696700F2CB68 /* ContentView.swift */; };
 		827B61D42B7E696800F2CB68 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 827B61D32B7E696800F2CB68 /* Assets.xcassets */; };
@@ -35,6 +37,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		822CF4012B9790D300927247 /* SPDiagnoseConfig.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = SPDiagnoseConfig.plist; sourceTree = "<group>"; };
+		822CF4032B97943B00927247 /* SPDiagnoseConfig.example.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = SPDiagnoseConfig.example.plist; sourceTree = "<group>"; };
 		827B61CC2B7E696700F2CB68 /* iOSExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iOSExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		827B61CF2B7E696700F2CB68 /* iOSExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iOSExampleApp.swift; sourceTree = "<group>"; };
 		827B61D12B7E696700F2CB68 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -97,6 +101,8 @@
 		827B61CE2B7E696700F2CB68 /* iOSExample */ = {
 			isa = PBXGroup;
 			children = (
+				822CF4012B9790D300927247 /* SPDiagnoseConfig.plist */,
+				822CF4032B97943B00927247 /* SPDiagnoseConfig.example.plist */,
 				827B61CF2B7E696700F2CB68 /* iOSExampleApp.swift */,
 				827B61D12B7E696700F2CB68 /* ContentView.swift */,
 				827B61D32B7E696800F2CB68 /* Assets.xcassets */,
@@ -242,7 +248,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				827B61D82B7E696800F2CB68 /* Preview Assets.xcassets in Resources */,
+				822CF4042B97943B00927247 /* SPDiagnoseConfig.example.plist in Resources */,
 				827B61D42B7E696800F2CB68 /* Assets.xcassets in Resources */,
+				822CF4022B9790D300927247 /* SPDiagnoseConfig.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

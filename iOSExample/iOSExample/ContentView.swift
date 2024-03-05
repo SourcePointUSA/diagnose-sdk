@@ -18,7 +18,7 @@ struct ContentView: View {
             Button(action: {
                 sendRequestTo("https://sourcepoint.com")
             }, label: {
-                Text("Send Request!")
+                Text("Request using URLSession")
             })
         }
         .padding()

@@ -7,13 +7,15 @@
 
 import Foundation
 
-class NetworkClient {
+class SPNetworkClient {
+    // TODO: inject as dependency
+    var auth = SPConfig.key ?? ""
+
     func put<Body: Encodable, Response: Decodable>(_ url: URL, body: Body) async throws -> Response {
         var request = URLRequest(url: url)
         request.httpMethod = "PUT"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InZhZGltLnBAZ293b21iYXQudGVhbSIsImV4cCI6MTcxMjkyNTk5N30.dTH4nyVS6UZzFWo57yArvG1YVGyYWr_Cv7NfBZP--e8", forHTTPHeaderField: "Authorization")
-
+        request.setValue("Bearer \(auth)", forHTTPHeaderField: "Authorization")
         do {
             let encoder = JSONEncoder()
             request.httpBody = try encoder.encode(body)
@@ -51,19 +53,26 @@ struct SendEventRequest: Encodable {
 struct SendEventResponse: Decodable {}
 
 @objcMembers class SPDiagnoseAPI: NSObject {
+    var baseUrl: URL { URL(string: "https://6pst9lv2dd.execute-api.eu-west-2.amazonaws.com")! }
+    var eventsUrl: URL { URL(string: "/stage/recordEvents/", relativeTo: baseUrl)! }
+
     func getConfig() {
         NSLog("DiagnoseAPI: getConfig()")
     }
 
     func sendEvent(_ event: SPDiagnose.Event) async {
+
         switch event {
             case .network(let domain, let tcString):
-                let _: SendEventResponse? = try? await NetworkClient()
-                    .put(
-                        URL(string: "https://6pst9lv2dd.execute-api.eu-west-2.amazonaws.com/stage/recordEvents/")!,
+                let _: SendEventResponse? = try? await SPNetworkClient()
+                    .put(eventsUrl,
                         body: SendEventRequest(
                             eventsLarge: [
-                                .init(ts: 999, domain: domain, tcString: tcString)
+                                .init(
+                                    ts: Int(Date.now.timeIntervalSince1970),
+                                    domain: domain,
+                                    tcString: tcString
+                                )
                             ]
                         )
                     )
