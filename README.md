@@ -1,7 +1,7 @@
 # diagnose-sdk
 
 to build
-```bash
+```bash 
 ./gradlew openApiGenerate
 ./gradlew build
 ```
