@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  SPLogger.swift
 //  
 //
 //  Created by Andre Herculano on 05.03.24.

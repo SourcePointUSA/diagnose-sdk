@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  SPDiagnoseAPI.swift
 //  
 //
 //  Created by Andre Herculano on 16.02.24.

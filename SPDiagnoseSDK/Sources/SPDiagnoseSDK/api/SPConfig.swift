@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  SPConfig.swift
 //  
 //
 //  Created by Andre Herculano on 05.03.24.
