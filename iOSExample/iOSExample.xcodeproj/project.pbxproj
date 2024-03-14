@@ -17,6 +17,8 @@
 		827B61EE2B7E696900F2CB68 /* iOSExampleUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 827B61ED2B7E696900F2CB68 /* iOSExampleUITestsLaunchTests.swift */; };
 		829446A42B7F824700C72043 /* SPDiagnoseSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 829446A32B7F824700C72043 /* SPDiagnoseSDK */; };
 		829EBC052BA1E0700063F156 /* SPDiagnoseConfig.plist in Resources */ = {isa = PBXBuildFile; fileRef = 829EBC042BA1E0700063F156 /* SPDiagnoseConfig.plist */; };
+		829EBC082BA33A820063F156 /* SPDiagnoseSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 829EBC072BA33A820063F156 /* SPDiagnoseSDK */; };
+		829EBC0B2BA33B340063F156 /* SPDiagnoseSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 829EBC0A2BA33B340063F156 /* SPDiagnoseSDK */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,7 +59,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				829EBC082BA33A820063F156 /* SPDiagnoseSDK in Frameworks */,
 				829446A42B7F824700C72043 /* SPDiagnoseSDK in Frameworks */,
+				829EBC0B2BA33B340063F156 /* SPDiagnoseSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -155,6 +159,8 @@
 			name = iOSExample;
 			packageProductDependencies = (
 				829446A32B7F824700C72043 /* SPDiagnoseSDK */,
+				829EBC072BA33A820063F156 /* SPDiagnoseSDK */,
+				829EBC0A2BA33B340063F156 /* SPDiagnoseSDK */,
 			);
 			productName = iOSExample;
 			productReference = 827B61CC2B7E696700F2CB68 /* iOSExample.app */;
@@ -229,7 +235,7 @@
 			);
 			mainGroup = 827B61C32B7E696700F2CB68;
 			packageReferences = (
-				829446A22B7F824700C72043 /* XCLocalSwiftPackageReference "../SPDiagnoseSDK" */,
+				829EBC092BA33B340063F156 /* XCLocalSwiftPackageReference ".." */,
 			);
 			productRefGroup = 827B61CD2B7E696700F2CB68 /* Products */;
 			projectDirPath = "";
@@ -637,14 +643,22 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		829446A22B7F824700C72043 /* XCLocalSwiftPackageReference "../SPDiagnoseSDK" */ = {
+		829EBC092BA33B340063F156 /* XCLocalSwiftPackageReference ".." */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = ../SPDiagnoseSDK;
+			relativePath = ..;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		829446A32B7F824700C72043 /* SPDiagnoseSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SPDiagnoseSDK;
+		};
+		829EBC072BA33A820063F156 /* SPDiagnoseSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SPDiagnoseSDK;
+		};
+		829EBC0A2BA33B340063F156 /* SPDiagnoseSDK */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = SPDiagnoseSDK;
 		};

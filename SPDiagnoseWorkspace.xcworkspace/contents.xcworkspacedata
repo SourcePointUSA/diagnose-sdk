@@ -1,9 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Workspace
    version = "1.0">
-   <FileRef
-      location = "group:SPDiagnoseSDK">
-   </FileRef>
+   <Group
+      location = "container:"
+      name = "SPDiagnoseSDK">
+      <FileRef
+         location = "group:Package.swift">
+      </FileRef>
+      <FileRef
+         location = "group:README.md">
+      </FileRef>
+      <Group
+         location = "group:Sources"
+         name = "Sources">
+         <Group
+            location = "group:SPDiagnoseSDK"
+            name = "SPDiagnoseSDK">
+            <FileRef
+               location = "group:SPDiagnose+AppDelegate.swift">
+            </FileRef>
+            <Group
+               location = "group:api"
+               name = "api">
+               <FileRef
+                  location = "group:SPConfig.swift">
+               </FileRef>
+               <FileRef
+                  location = "group:SPLogger.swift">
+               </FileRef>
+               <FileRef
+                  location = "group:SPDiagnoseAPI.swift">
+               </FileRef>
+            </Group>
+            <FileRef
+               location = "group:SPDiagnoseSDK.swift">
+            </FileRef>
+         </Group>
+      </Group>
+      <Group
+         location = "group:Tests"
+         name = "Tests">
+         <Group
+            location = "group:SPDiagnoseSDKTests"
+            name = "SPDiagnoseSDKTests">
+            <FileRef
+               location = "group:SPDiagnoseSDKTests.swift">
+            </FileRef>
+         </Group>
+      </Group>
+   </Group>
    <FileRef
       location = "group:iOSExample/iOSExample.xcodeproj">
    </FileRef>
