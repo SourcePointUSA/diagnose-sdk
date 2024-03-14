@@ -13,3 +13,5 @@ replay_pid*
 .idea/
 xcuserdata/
 project.xcworkspace/
+
+iOSExample/iOSExample/SPDiagnoseConfig.plist
