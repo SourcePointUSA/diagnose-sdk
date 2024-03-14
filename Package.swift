@@ -1,0 +1,1 @@
+SPDiagnoseSDK/Package.swift
