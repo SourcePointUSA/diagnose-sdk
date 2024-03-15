@@ -1,12 +1,12 @@
 //
 //  module.map.modulemap
-//  SPDiagnoseSDK
+//  SPDiagnose
 //
 //  Created by Andre Herculano on 15.03.24.
 //
 
-framework module SPDiagnoseSDK {
-    umbrella header "SPDiagnoseSDK.h"
+framework module SPDiagnose {
+    umbrella header "SPDiagnose.h"
 
     export *
     module * { export * }

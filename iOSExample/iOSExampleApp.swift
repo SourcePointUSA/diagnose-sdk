@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import SPDiagnoseSDK
+import SPDiagnose
 
 @main
 struct iOSExampleApp: App {

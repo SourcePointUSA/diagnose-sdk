@@ -1,6 +1,6 @@
 //
-//  SPDiagnoseSDK.h
-//  SPDiagnoseSDK
+//  SPDiagnose.h
+//  SPDiagnose
 //
 //  Created by Andre Herculano on 14.03.24.
 //
@@ -17,7 +17,7 @@
 #endif
 #endif
 
-#import "SPDiagnoseSDKSwizzler.h"
+#import "SPDiagnoseSwizzler.h"
 
-FOUNDATION_EXPORT double SPDiagnoseSDKVersionNumber;
-FOUNDATION_EXPORT const unsigned char SPDiagnoseSDKVersionString[];
+FOUNDATION_EXPORT double SPDiagnoseVersionNumber;
+FOUNDATION_EXPORT const unsigned char SPDiagnoseVersionString[];

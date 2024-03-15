@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "829EBC382BA3417F0063F156"
-               BuildableName = "SPDiagnoseSDK.framework"
-               BlueprintName = "SPDiagnoseSDK"
-               ReferencedContainer = "container:SPDiagnoseSDK.xcodeproj">
+               BuildableName = "SPDiagnose.framework"
+               BlueprintName = "SPDiagnose"
+               ReferencedContainer = "container:SPDiagnose.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -50,9 +50,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "829EBC382BA3417F0063F156"
-            BuildableName = "SPDiagnoseSDK.framework"
-            BlueprintName = "SPDiagnoseSDK"
-            ReferencedContainer = "container:SPDiagnoseSDK.xcodeproj">
+            BuildableName = "SPDiagnose.framework"
+            BlueprintName = "SPDiagnose"
+            ReferencedContainer = "container:SPDiagnose.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>

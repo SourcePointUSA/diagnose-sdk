@@ -1,6 +1,6 @@
 //
-//  SPDiagnoseSDK.m
-//  SPDiagnoseSDK
+//  SPDiagnose.m
+//  SPDiagnose
 //
 //  Created by Andre Herculano on 15.03.24.
 //
@@ -9,10 +9,10 @@
 #import <objc/runtime.h>
 #import <Foundation/Foundation.h>
 
-#if __has_include(<SPDiagnoseSDK/SPDiagnoseSDK-Swift.h>)
-#import <SPDiagnoseSDK/SPDiagnoseSDK-Swift.h>
+#if __has_include(<SPDiagnose/SPDiagnose-Swift.h>)
+#import <SPDiagnose/SPDiagnose-Swift.h>
 #else
-#import "SPDiagnoseSDK-Swift.h"
+#import "SPDiagnose-Swift.h"
 #endif
 
 

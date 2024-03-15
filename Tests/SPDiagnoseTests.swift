@@ -1,14 +1,14 @@
 //
-//  SPDiagnoseSDKTests.swift
-//  SPDiagnoseSDKTests
+//  SPDiagnoseTests.swift
+//  SPDiagnoseTests
 //
 //  Created by Andre Herculano on 14.03.24.
 //
 
 import XCTest
-@testable import SPDiagnoseSDK
+@testable import SPDiagnose
 
-class SPDiagnoseSDKTests: XCTestCase {
+class SPDiagnoseTests: XCTestCase {
 
     override func setUpWithError() throws {}
 

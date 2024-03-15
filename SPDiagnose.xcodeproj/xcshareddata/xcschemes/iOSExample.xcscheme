@@ -17,7 +17,7 @@
                BlueprintIdentifier = "827B61CB2B7E696700F2CB68"
                BuildableName = "iOSExample.app"
                BlueprintName = "iOSExample"
-               ReferencedContainer = "container:SPDiagnoseSDK.xcodeproj">
+               ReferencedContainer = "container:SPDiagnose.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -37,7 +37,7 @@
                BlueprintIdentifier = "827B61DC2B7E696900F2CB68"
                BuildableName = "iOSExampleTests.xctest"
                BlueprintName = "iOSExampleTests"
-               ReferencedContainer = "container:SPDiagnoseSDK.xcodeproj">
+               ReferencedContainer = "container:SPDiagnose.xcodeproj">
             </BuildableReference>
          </TestableReference>
          <TestableReference
@@ -48,7 +48,7 @@
                BlueprintIdentifier = "827B61E62B7E696900F2CB68"
                BuildableName = "SPDiagnoseSDKUITests.xctest"
                BlueprintName = "SPDiagnoseSDKUITests"
-               ReferencedContainer = "container:SPDiagnoseSDK.xcodeproj">
+               ReferencedContainer = "container:SPDiagnose.xcodeproj">
             </BuildableReference>
          </TestableReference>
          <TestableReference
@@ -57,9 +57,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "829EBC3F2BA3417F0063F156"
-               BuildableName = "SPDiagnoseSDKTests.xctest"
-               BlueprintName = "SPDiagnoseSDKTests"
-               ReferencedContainer = "container:SPDiagnoseSDK.xcodeproj">
+               BuildableName = "SPDiagnoseTests.xctest"
+               BlueprintName = "SPDiagnoseTests"
+               ReferencedContainer = "container:SPDiagnose.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -81,7 +81,7 @@
             BlueprintIdentifier = "827B61CB2B7E696700F2CB68"
             BuildableName = "iOSExample.app"
             BlueprintName = "iOSExample"
-            ReferencedContainer = "container:SPDiagnoseSDK.xcodeproj">
+            ReferencedContainer = "container:SPDiagnose.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -98,7 +98,7 @@
             BlueprintIdentifier = "827B61CB2B7E696700F2CB68"
             BuildableName = "iOSExample.app"
             BlueprintName = "iOSExample"
-            ReferencedContainer = "container:SPDiagnoseSDK.xcodeproj">
+            ReferencedContainer = "container:SPDiagnose.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
