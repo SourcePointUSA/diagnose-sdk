@@ -9,7 +9,7 @@ import Foundation
 
 class SPNetworkClient {
     // TODO: inject as dependency
-    var auth = SPConfig.key ?? ""
+    var auth = try! SPConfig().key
 
     func put<Body: Encodable, Response: Decodable>(_ url: URL, body: Body) async throws -> Response {
         var request = URLRequest(url: url)
@@ -57,25 +57,28 @@ struct SendEventResponse: Decodable {}
     var eventsUrl: URL { URL(string: "/stage/recordEvents/", relativeTo: baseUrl)! }
 
     func getConfig() {
-        NSLog("DiagnoseAPI: getConfig()")
+        SPLogger.log("DiagnoseAPI.getConfig()")
     }
 
     func sendEvent(_ event: SPDiagnose.Event) async {
-
-        switch event {
-            case .network(let domain, let tcString):
-                let _: SendEventResponse? = try? await SPNetworkClient()
-                    .put(eventsUrl,
-                        body: SendEventRequest(
-                            eventsLarge: [
-                                .init(
-                                    ts: Int(Date.now.timeIntervalSince1970),
-                                    domain: domain,
-                                    tcString: tcString
-                                )
-                            ]
+        do {
+            switch event {
+                case .network(let domain, let tcString):
+                    let _: SendEventResponse? = try await SPNetworkClient()
+                        .put(eventsUrl,
+                             body: SendEventRequest(
+                                eventsLarge: [
+                                    .init(
+                                        ts: Int(Date.now.timeIntervalSince1970),
+                                        domain: domain,
+                                        tcString: tcString
+                                    )
+                                ]
+                             )
                         )
-                    )
+            }
+        } catch {
+            SPLogger.log("failed to sendEvent: \( error.localizedDescription)")
         }
     }
 }

@@ -7,15 +7,25 @@
 
 import Foundation
 
-struct SPConfig {
-    private static let plistName = "SPDiagnoseConfig"
+enum SPDiagnoseError: Error {
+    case configNotFound(_ message: String)
+    case unableToParseConfig(_ message: String)
+}
 
-    private static func getValue(name: String) -> String? {
-        if let path = Bundle.main.path(forResource: "SPDiagnoseConfig", ofType: "plist") {
-            return NSDictionary(contentsOfFile: path)?[name] as? String
+struct SPConfig: Codable {
+    init() throws {
+        guard let path = Bundle.main.path(forResource: "SPDiagnoseConfig", ofType: "plist")
+        else {
+            throw SPDiagnoseError.configNotFound("Couldn't initialise DiagnoseSDK config. Make sure SPDiagnoseConfig.plist exists in the root folder of your project")
         }
-        return nil
+        do {
+            let data = try Data(contentsOf: NSURL.fileURL(withPath: path))
+            let decoder = PropertyListDecoder()
+            self = try decoder.decode(Self.self, from: data)
+        } catch {
+            throw SPDiagnoseError.unableToParseConfig(error.localizedDescription)
+        }
     }
 
-    static var key: String? { getValue(name: "key") }
+    let key: String
 }
