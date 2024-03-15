@@ -4,24 +4,30 @@
 import PackageDescription
 
 let package = Package(
-    name: "SPDiagnoseSDK",
+    name: "SPDiagnose",
     platforms: [.iOS(.v15)],
     products: [
         .library(
-            name: "SPDiagnoseSDK",
-            targets: ["SPDiagnoseSDK"]
+            name: "SPDiagnose",
+            targets: ["SPDiagnose", "SPDiagnoseObjc"]
         ),
     ], 
     dependencies: [],
     targets: [
         .target(
-            name: "SPDiagnoseSDK", 
+            name: "SPDiagnoseObjc",
             dependencies: [],
-            path: "Sources"
+            path: "Sources/objc",
+            cSettings: [ .headerSearchPath("./")]
+        ),
+        .target(
+            name: "SPDiagnose",
+            path: "Sources",
+            exclude: ["objc"]
         ),
         .testTarget(
-            name: "SPDiagnoseSDKTests",
-            dependencies: ["SPDiagnoseSDK"],
+            name: "SPDiagnoseTests",
+            dependencies: ["SPDiagnose"],
             path: "Tests"
         ),
     ]
