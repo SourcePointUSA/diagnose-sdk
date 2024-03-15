@@ -15,9 +15,14 @@ let package = Package(
     dependencies: [],
     targets: [
         .target(
-            name: "SPDiagnoseSDK", dependencies: []),
+            name: "SPDiagnoseSDK", 
+            dependencies: [],
+            path: "Sources"
+        ),
         .testTarget(
             name: "SPDiagnoseSDKTests",
-            dependencies: ["SPDiagnoseSDK"]),
+            dependencies: ["SPDiagnoseSDK"],
+            path: "Tests"
+        ),
     ]
 )

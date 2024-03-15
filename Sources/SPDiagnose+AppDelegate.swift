@@ -12,7 +12,6 @@ public class SPDiagnoseAppDelegate: NSObject, UIApplicationDelegate {
     var diagnose: SPDiagnose?
 
     public func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-
         diagnose = SPDiagnose()
         return true
     }
