@@ -7,12 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		8205F22A2BA4A59800A47D82 /* SPDiagnose.h in Headers */ = {isa = PBXBuildFile; fileRef = 8205F2232BA4A59800A47D82 /* SPDiagnose.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8205F22B2BA4A59800A47D82 /* SPDiagnoseSwizzler.h in Headers */ = {isa = PBXBuildFile; fileRef = 8205F2242BA4A59800A47D82 /* SPDiagnoseSwizzler.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8205F22C2BA4A59800A47D82 /* SPDiagnoseSwizzler.m in Sources */ = {isa = PBXBuildFile; fileRef = 8205F2252BA4A59800A47D82 /* SPDiagnoseSwizzler.m */; };
 		8205F22D2BA4A59800A47D82 /* SPConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8205F2272BA4A59800A47D82 /* SPConfig.swift */; };
 		8205F22E2BA4A59800A47D82 /* SPLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8205F2282BA4A59800A47D82 /* SPLogger.swift */; };
 		8205F22F2BA4A59800A47D82 /* SPDiagnoseAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8205F2292BA4A59800A47D82 /* SPDiagnoseAPI.swift */; };
+		8205F2332BA4A7EC00A47D82 /* SPDiagnose.h in Headers */ = {isa = PBXBuildFile; fileRef = 8205F2312BA4A7EC00A47D82 /* SPDiagnose.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8205F2342BA4A7EC00A47D82 /* SPDiagnoseSwizzler.h in Headers */ = {isa = PBXBuildFile; fileRef = 8205F2322BA4A7EC00A47D82 /* SPDiagnoseSwizzler.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		822CF4042B97943B00927247 /* SPDiagnoseConfig.example.plist in Resources */ = {isa = PBXBuildFile; fileRef = 822CF4032B97943B00927247 /* SPDiagnoseConfig.example.plist */; };
 		827B61D02B7E696700F2CB68 /* iOSExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 827B61CF2B7E696700F2CB68 /* iOSExampleApp.swift */; };
 		827B61D22B7E696700F2CB68 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 827B61D12B7E696700F2CB68 /* ContentView.swift */; };
@@ -69,12 +69,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		8205F2232BA4A59800A47D82 /* SPDiagnose.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPDiagnose.h; sourceTree = "<group>"; };
-		8205F2242BA4A59800A47D82 /* SPDiagnoseSwizzler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPDiagnoseSwizzler.h; sourceTree = "<group>"; };
 		8205F2252BA4A59800A47D82 /* SPDiagnoseSwizzler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPDiagnoseSwizzler.m; sourceTree = "<group>"; };
 		8205F2272BA4A59800A47D82 /* SPConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPConfig.swift; sourceTree = "<group>"; };
 		8205F2282BA4A59800A47D82 /* SPLogger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPLogger.swift; sourceTree = "<group>"; };
 		8205F2292BA4A59800A47D82 /* SPDiagnoseAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPDiagnoseAPI.swift; sourceTree = "<group>"; };
+		8205F2312BA4A7EC00A47D82 /* SPDiagnose.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPDiagnose.h; sourceTree = "<group>"; };
+		8205F2322BA4A7EC00A47D82 /* SPDiagnoseSwizzler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPDiagnoseSwizzler.h; sourceTree = "<group>"; };
 		822CF4032B97943B00927247 /* SPDiagnoseConfig.example.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = SPDiagnoseConfig.example.plist; sourceTree = "<group>"; };
 		82721AEA2BA46F5300A50E43 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		827B61CC2B7E696700F2CB68 /* iOSExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iOSExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -124,8 +124,7 @@
 		8205F2212BA4A59800A47D82 /* objc */ = {
 			isa = PBXGroup;
 			children = (
-				8205F2232BA4A59800A47D82 /* SPDiagnose.h */,
-				8205F2242BA4A59800A47D82 /* SPDiagnoseSwizzler.h */,
+				8205F2302BA4A7EC00A47D82 /* include */,
 				8205F2252BA4A59800A47D82 /* SPDiagnoseSwizzler.m */,
 			);
 			path = objc;
@@ -139,6 +138,15 @@
 				8205F2292BA4A59800A47D82 /* SPDiagnoseAPI.swift */,
 			);
 			path = api;
+			sourceTree = "<group>";
+		};
+		8205F2302BA4A7EC00A47D82 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				8205F2312BA4A7EC00A47D82 /* SPDiagnose.h */,
+				8205F2322BA4A7EC00A47D82 /* SPDiagnoseSwizzler.h */,
+			);
+			path = include;
 			sourceTree = "<group>";
 		};
 		827B61C32B7E696700F2CB68 = {
@@ -221,8 +229,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8205F22A2BA4A59800A47D82 /* SPDiagnose.h in Headers */,
-				8205F22B2BA4A59800A47D82 /* SPDiagnoseSwizzler.h in Headers */,
+				8205F2332BA4A7EC00A47D82 /* SPDiagnose.h in Headers */,
+				8205F2342BA4A7EC00A47D82 /* SPDiagnoseSwizzler.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
