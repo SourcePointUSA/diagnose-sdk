@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		8205F2172BA4930F00A47D82 /* SPDiagnoseSDK.m in Sources */ = {isa = PBXBuildFile; fileRef = 8205F2162BA4930F00A47D82 /* SPDiagnoseSDK.m */; };
+		8205F2172BA4930F00A47D82 /* SPDiagnoseSDKSwizzler.m in Sources */ = {isa = PBXBuildFile; fileRef = 8205F2162BA4930F00A47D82 /* SPDiagnoseSDKSwizzler.m */; };
 		822CF4042B97943B00927247 /* SPDiagnoseConfig.example.plist in Resources */ = {isa = PBXBuildFile; fileRef = 822CF4032B97943B00927247 /* SPDiagnoseConfig.example.plist */; };
 		827B61D02B7E696700F2CB68 /* iOSExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 827B61CF2B7E696700F2CB68 /* iOSExampleApp.swift */; };
 		827B61D22B7E696700F2CB68 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 827B61D12B7E696700F2CB68 /* ContentView.swift */; };
@@ -64,7 +64,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		8205F2162BA4930F00A47D82 /* SPDiagnoseSDK.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SPDiagnoseSDK.m; sourceTree = "<group>"; };
+		8205F2162BA4930F00A47D82 /* SPDiagnoseSDKSwizzler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SPDiagnoseSDKSwizzler.m; sourceTree = "<group>"; };
 		822CF4032B97943B00927247 /* SPDiagnoseConfig.example.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = SPDiagnoseConfig.example.plist; sourceTree = "<group>"; };
 		82721AEA2BA46F5300A50E43 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		827B61CC2B7E696700F2CB68 /* iOSExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iOSExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -162,7 +162,7 @@
 				829EBC6B2BA344190063F156 /* SPDiagnoseSDK.h */,
 				829EBC662BA344190063F156 /* api */,
 				829EBC6A2BA344190063F156 /* SPDiagnoseSDK.swift */,
-				8205F2162BA4930F00A47D82 /* SPDiagnoseSDK.m */,
+				8205F2162BA4930F00A47D82 /* SPDiagnoseSDKSwizzler.m */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -343,7 +343,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				82C5AEE02BA3491900850FC9 /* SPLogger.swift in Sources */,
-				8205F2172BA4930F00A47D82 /* SPDiagnoseSDK.m in Sources */,
+				8205F2172BA4930F00A47D82 /* SPDiagnoseSDKSwizzler.m in Sources */,
 				82C5AEE12BA3491900850FC9 /* SPDiagnoseAPI.swift in Sources */,
 				82C5AEDD2BA3490C00850FC9 /* SPDiagnose+AppDelegate.swift in Sources */,
 				82C5AEDE2BA3491400850FC9 /* SPDiagnoseSDK.swift in Sources */,
