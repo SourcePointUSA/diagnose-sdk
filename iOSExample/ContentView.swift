@@ -9,7 +9,9 @@ import SwiftUI
 
 func sendRequestTo(_ url: String) {
     guard let url = URL(string: url) else { return }
-    URLSession.shared.dataTask(with: URLRequest(url: url)).resume()
+    URLSession(configuration: .default)
+        .dataTask(with: URLRequest(url: url))
+        .resume()
 }
 
 struct ContentView: View {

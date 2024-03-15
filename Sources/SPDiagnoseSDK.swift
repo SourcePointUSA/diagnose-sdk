@@ -63,9 +63,15 @@ extension SPDiagnose {
     let networkSubscriber: NetworkSubscriber
 
     static func injectLogger() {
+        injectLogger(configuration: URLSessionConfiguration.default)
+    }
+
+    @objc public static func injectLogger(configuration: URLSessionConfiguration) {
         URLProtocol.registerClass(NetworkLogger.self)
-        let config = URLSessionConfiguration.default
-        config.protocolClasses = [NetworkLogger.self] + (config.protocolClasses ?? [])
+        let protocols = configuration.protocolClasses ?? []
+        if !protocols.contains(where: { $0 == NetworkLogger.self }) {
+            configuration.protocolClasses = [NetworkLogger.self] + protocols
+        }
     }
 
     public override init() {
@@ -93,13 +99,11 @@ extension SPDiagnose {
 
     convenience public init(sessionConfig: URLSessionConfiguration) {
         self.init()
-        sessionConfig.protocolClasses = [NetworkLogger.self] + (sessionConfig.protocolClasses ?? [])
+        Self.injectLogger(configuration: sessionConfig)
     }
 
     convenience public init(sessionConfigs: [URLSessionConfiguration]) {
         self.init()
-        sessionConfigs.forEach { config in
-            config.protocolClasses = [NetworkLogger.self] + (config.protocolClasses ?? [])
-        }
+        sessionConfigs.forEach { Self.injectLogger(configuration: $0) }
     }
 }
