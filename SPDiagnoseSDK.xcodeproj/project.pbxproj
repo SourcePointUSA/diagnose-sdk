@@ -68,6 +68,7 @@
 /* Begin PBXFileReference section */
 		8205F2162BA4930F00A47D82 /* SPDiagnoseSDKSwizzler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SPDiagnoseSDKSwizzler.m; sourceTree = "<group>"; };
 		8205F21A2BA49F2F00A47D82 /* SPDiagnoseSDKSwizzler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPDiagnoseSDKSwizzler.h; sourceTree = "<group>"; };
+		8205F21D2BA4A00400A47D82 /* module.map.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = module.map.modulemap; sourceTree = "<group>"; };
 		822CF4032B97943B00927247 /* SPDiagnoseConfig.example.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = SPDiagnoseConfig.example.plist; sourceTree = "<group>"; };
 		82721AEA2BA46F5300A50E43 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		827B61CC2B7E696700F2CB68 /* iOSExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iOSExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -167,6 +168,7 @@
 				829EBC6A2BA344190063F156 /* SPDiagnoseSDK.swift */,
 				8205F2162BA4930F00A47D82 /* SPDiagnoseSDKSwizzler.m */,
 				8205F21A2BA49F2F00A47D82 /* SPDiagnoseSDKSwizzler.h */,
+				8205F21D2BA4A00400A47D82 /* module.map.modulemap */,
 			);
 			path = Sources;
 			sourceTree = "<group>";

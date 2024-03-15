@@ -17,5 +17,7 @@
 #endif
 #endif
 
+#import "SPDiagnoseSDKSwizzler.h"
+
 FOUNDATION_EXPORT double SPDiagnoseSDKVersionNumber;
 FOUNDATION_EXPORT const unsigned char SPDiagnoseSDKVersionString[];
