@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		8205F2172BA4930F00A47D82 /* SPDiagnoseSDKSwizzler.m in Sources */ = {isa = PBXBuildFile; fileRef = 8205F2162BA4930F00A47D82 /* SPDiagnoseSDKSwizzler.m */; };
+		8205F21B2BA49F2F00A47D82 /* SPDiagnoseSDKSwizzler.h in Headers */ = {isa = PBXBuildFile; fileRef = 8205F21A2BA49F2F00A47D82 /* SPDiagnoseSDKSwizzler.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8205F21C2BA49F6300A47D82 /* SPDiagnoseSDK.h in Headers */ = {isa = PBXBuildFile; fileRef = 829EBC6B2BA344190063F156 /* SPDiagnoseSDK.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		822CF4042B97943B00927247 /* SPDiagnoseConfig.example.plist in Resources */ = {isa = PBXBuildFile; fileRef = 822CF4032B97943B00927247 /* SPDiagnoseConfig.example.plist */; };
 		827B61D02B7E696700F2CB68 /* iOSExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 827B61CF2B7E696700F2CB68 /* iOSExampleApp.swift */; };
 		827B61D22B7E696700F2CB68 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 827B61D12B7E696700F2CB68 /* ContentView.swift */; };
@@ -65,6 +67,7 @@
 
 /* Begin PBXFileReference section */
 		8205F2162BA4930F00A47D82 /* SPDiagnoseSDKSwizzler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SPDiagnoseSDKSwizzler.m; sourceTree = "<group>"; };
+		8205F21A2BA49F2F00A47D82 /* SPDiagnoseSDKSwizzler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPDiagnoseSDKSwizzler.h; sourceTree = "<group>"; };
 		822CF4032B97943B00927247 /* SPDiagnoseConfig.example.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = SPDiagnoseConfig.example.plist; sourceTree = "<group>"; };
 		82721AEA2BA46F5300A50E43 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		827B61CC2B7E696700F2CB68 /* iOSExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iOSExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -163,6 +166,7 @@
 				829EBC662BA344190063F156 /* api */,
 				829EBC6A2BA344190063F156 /* SPDiagnoseSDK.swift */,
 				8205F2162BA4930F00A47D82 /* SPDiagnoseSDKSwizzler.m */,
+				8205F21A2BA49F2F00A47D82 /* SPDiagnoseSDKSwizzler.h */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -192,6 +196,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8205F21C2BA49F6300A47D82 /* SPDiagnoseSDK.h in Headers */,
+				8205F21B2BA49F2F00A47D82 /* SPDiagnoseSDKSwizzler.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

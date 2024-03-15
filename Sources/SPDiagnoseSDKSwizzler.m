@@ -7,7 +7,13 @@
 
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
+#import <Foundation/Foundation.h>
+
+#if __has_include(<SPDiagnoseSDK/SPDiagnoseSDK-Swift.h>)
 #import <SPDiagnoseSDK/SPDiagnoseSDK-Swift.h>
+#else
+#import "SPDiagnoseSDK-Swift.h"
+#endif
 
 
 /// Library constructor to observe `UIApplicationDidFinishLaunchingNotification` immediately on app launch.
