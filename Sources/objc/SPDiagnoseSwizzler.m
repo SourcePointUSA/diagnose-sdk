@@ -12,7 +12,7 @@
 #if __has_include(<SPDiagnose/SPDiagnose-Swift.h>)
 #import <SPDiagnose/SPDiagnose-Swift.h>
 #else
-#import "SPDiagnose-Swift.h"
+@import SPDiagnose;
 #endif
 
 

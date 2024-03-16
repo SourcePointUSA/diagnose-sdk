@@ -25,9 +25,6 @@
 		829EBC952BA3447E0063F156 /* SPDiagnoseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 829EBC922BA3444A0063F156 /* SPDiagnoseTests.swift */; };
 		82C5AEDD2BA3490C00850FC9 /* SPDiagnose+AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 829EBC642BA344190063F156 /* SPDiagnose+AppDelegate.swift */; };
 		82C5AEDE2BA3491400850FC9 /* SPDiagnose.swift in Sources */ = {isa = PBXBuildFile; fileRef = 829EBC6A2BA344190063F156 /* SPDiagnose.swift */; };
-		82C5AEDF2BA3491900850FC9 /* SPConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 829EBC672BA344190063F156 /* SPConfig.swift */; };
-		82C5AEE02BA3491900850FC9 /* SPLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 829EBC682BA344190063F156 /* SPLogger.swift */; };
-		82C5AEE12BA3491900850FC9 /* SPDiagnoseAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 829EBC692BA344190063F156 /* SPDiagnoseAPI.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -143,7 +140,6 @@
 		8205F2302BA4A7EC00A47D82 /* include */ = {
 			isa = PBXGroup;
 			children = (
-				8205F2312BA4A7EC00A47D82 /* SPDiagnose.h */,
 				8205F2322BA4A7EC00A47D82 /* SPDiagnoseSwizzler.h */,
 			);
 			path = include;
@@ -195,6 +191,7 @@
 		829EBC632BA344190063F156 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				8205F2312BA4A7EC00A47D82 /* SPDiagnose.h */,
 				8205F2262BA4A59800A47D82 /* api */,
 				8205F2212BA4A59800A47D82 /* objc */,
 				829EBC642BA344190063F156 /* SPDiagnose+AppDelegate.swift */,
@@ -381,15 +378,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				82C5AEE02BA3491900850FC9 /* SPLogger.swift in Sources */,
-				82C5AEE12BA3491900850FC9 /* SPDiagnoseAPI.swift in Sources */,
 				8205F22C2BA4A59800A47D82 /* SPDiagnoseSwizzler.m in Sources */,
 				8205F22F2BA4A59800A47D82 /* SPDiagnoseAPI.swift in Sources */,
 				82C5AEDD2BA3490C00850FC9 /* SPDiagnose+AppDelegate.swift in Sources */,
 				8205F22E2BA4A59800A47D82 /* SPLogger.swift in Sources */,
 				82C5AEDE2BA3491400850FC9 /* SPDiagnose.swift in Sources */,
 				8205F22D2BA4A59800A47D82 /* SPConfig.swift in Sources */,
-				82C5AEDF2BA3491900850FC9 /* SPConfig.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

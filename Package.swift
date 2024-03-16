@@ -9,19 +9,19 @@ let package = Package(
     products: [
         .library(
             name: "SPDiagnose",
-            targets: ["SPDiagnose", "SPDiagnoseObjc"]
+            targets: ["SPDiagnose"]
         ),
     ], 
     dependencies: [],
     targets: [
         .target(
             name: "SPDiagnoseObjc",
-            dependencies: [],
-            path: "Sources/objc",
-            cSettings: [ .headerSearchPath("./")]
+            dependencies: ["SPDiagnose"],
+            path: "Sources/objc"
         ),
         .target(
             name: "SPDiagnose",
+            dependencies: [],
             path: "Sources",
             exclude: ["objc"]
         ),
