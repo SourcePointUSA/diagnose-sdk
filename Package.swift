@@ -9,7 +9,7 @@ let package = Package(
     products: [
         .library(
             name: "SPDiagnose",
-            targets: ["SPDiagnose"]
+            targets: ["SPDiagnose", "SPDiagnoseObjc"]
         ),
     ], 
     dependencies: [],
