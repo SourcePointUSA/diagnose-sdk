@@ -16,7 +16,7 @@ Make sure to add a property list file called `SPDiagnoseConfig.plist` to your pr
 
 ```
 
-### Adding it as a d only ependency
+### Adding it as a dependency
 
 At this point, the Diagnose SDK can be declared as a dependency using Swift Package Manager (SPM).
 
