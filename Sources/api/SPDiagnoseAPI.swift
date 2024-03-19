@@ -43,7 +43,7 @@ struct SendEventRequest: Encodable {
     struct Event: Encodable {
         let ts: Int
         let domain: String
-        let type: String = ""
+        let type: String = "network"
         let valid: Bool = true
         let tcString: String?
     }
@@ -53,8 +53,8 @@ struct SendEventRequest: Encodable {
 struct SendEventResponse: Decodable {}
 
 @objcMembers class SPDiagnoseAPI: NSObject {
-    var baseUrl: URL { URL(string: "https://6pst9lv2dd.execute-api.eu-west-2.amazonaws.com")! }
-    var eventsUrl: URL { URL(string: "/stage/recordEvents/", relativeTo: baseUrl)! }
+    var baseUrl: URL { URL(string: "https://njjydfm0r0.execute-api.eu-west-2.amazonaws.com")! }
+    var eventsUrl: URL { URL(string: "/compliance-api/recordEvents/?_version=1.0.24", relativeTo: baseUrl)! }
 
     func getConfig() {
         SPLogger.log("DiagnoseAPI.getConfig()")
