@@ -28,4 +28,6 @@ struct SPConfig: Codable {
     }
 
     let key: String
+    let appName: String?
+    let accountId, propertyId: Int
 }

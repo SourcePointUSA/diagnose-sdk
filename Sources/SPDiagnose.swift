@@ -76,7 +76,19 @@ extension SPDiagnose {
 
     public override init() {
         Self.injectLogger()
-        let dApi = SPDiagnoseAPI()
+        let config: SPConfig!
+        do {
+            config = try SPConfig()
+        } catch {
+            fatalError("\(error)")
+        }
+
+        let dApi = SPDiagnoseAPI(
+            accountId: config.accountId,
+            propertyId: config.propertyId,
+            appName: config.appName,
+            key: config.key
+        )
         self.api = dApi
         self.networkSubscriber = NetworkSubscriber { domain in
             Task {

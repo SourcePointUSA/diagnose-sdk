@@ -8,8 +8,11 @@
 import Foundation
 
 class SPNetworkClient {
-    // TODO: inject as dependency
-    var auth = try! SPConfig().key
+    let auth: String
+
+    init(auth: String) {
+        self.auth = auth
+    }
 
     func put<Body: Encodable, Response: Decodable>(_ url: URL, body: Body) async throws -> Response {
         var request = URLRequest(url: url)
@@ -18,7 +21,9 @@ class SPNetworkClient {
         request.setValue("Bearer \(auth)", forHTTPHeaderField: "Authorization")
         do {
             let encoder = JSONEncoder()
-            request.httpBody = try encoder.encode(body)
+            let body = try encoder.encode(body)
+            request.httpBody = body
+            SPLogger.log(String(data: body, encoding: .utf8) ?? "")
         } catch {
             throw error
         }
@@ -39,22 +44,68 @@ class SPNetworkClient {
     }
 }
 
-struct SendEventRequest: Encodable {
-    struct Event: Encodable {
-        let ts: Int
-        let domain: String
-        let type: String = "network"
-        let valid: Bool = true
-        let tcString: String?
+enum Event: Encodable {
+    case network(ts: Int, data: NetworkEvent, type: String = "network")
+
+    enum NetworkCodingKeys: CodingKey {
+        case ts
+        case data
+        case type
     }
-    let eventsLarge: [Event]
+
+    func encode(to encoder: Encoder) throws {
+        switch self {
+            case .network(let ts, let data, let type):
+                var container = encoder.container(keyedBy: NetworkCodingKeys.self)
+                try container.encode(ts, forKey: NetworkCodingKeys.ts)
+                try container.encode(data, forKey: NetworkCodingKeys.data)
+                try container.encode(type, forKey: NetworkCodingKeys.type)
+        }
+    }
+}
+
+struct NetworkEvent: Encodable {
+    let domain: String
+    let gdprTCString: String?
+}
+
+struct SendEventRequest: Encodable {
+    let accountId, propertyId: Int
+    let appName: String?
+    let events: [Event]
 }
 
 struct SendEventResponse: Decodable {}
 
 @objcMembers class SPDiagnoseAPI: NSObject {
-    var baseUrl: URL { URL(string: "https://njjydfm0r0.execute-api.eu-west-2.amazonaws.com")! }
-    var eventsUrl: URL { URL(string: "/compliance-api/recordEvents/?_version=1.0.24", relativeTo: baseUrl)! }
+    let accountId, propertyId: Int
+    let appName: String?
+
+    var client: SPNetworkClient
+
+    var baseUrl: URL {
+        URL(string: "https://njjydfm0r0.execute-api.eu-west-2.amazonaws.com")!
+    }
+    var eventsUrl: URL {
+        URL(string: "/compliance-api/recordEvents/?_version=1.0.24", relativeTo: baseUrl)!
+    }
+
+    init(
+        accountId: Int,
+        propertyId: Int,
+        appName: String?,
+        key: String,
+        client: SPNetworkClient? = nil
+    ) {
+        self.accountId = accountId
+        self.propertyId = propertyId
+        self.appName = appName
+        guard let client = client else {
+            self.client = SPNetworkClient(auth: key)
+            return
+        }
+        self.client = client
+    }
 
     func getConfig() {
         SPLogger.log("DiagnoseAPI.getConfig()")
@@ -64,14 +115,19 @@ struct SendEventResponse: Decodable {}
         do {
             switch event {
                 case .network(let domain, let tcString):
-                    let _: SendEventResponse? = try await SPNetworkClient()
+                    let _: SendEventResponse? = try await client
                         .put(eventsUrl,
                              body: SendEventRequest(
-                                eventsLarge: [
-                                    .init(
+                                accountId: accountId,
+                                propertyId: propertyId,
+                                appName: appName,
+                                events: [
+                                    .network(
                                         ts: Int(Date.now.timeIntervalSince1970),
-                                        domain: domain,
-                                        tcString: tcString
+                                        data: .init(
+                                            domain: domain,
+                                            gdprTCString: tcString
+                                        )
                                     )
                                 ]
                              )
