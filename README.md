@@ -9,8 +9,14 @@ Make sure to add a property list file called `SPDiagnoseConfig.plist` to your pr
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>key</key>
-	<string>YOUR KEY GOES HERE</string>
+    <key>appName</key>
+    <string>myApp</string>
+    <key>propertyId</key>
+    <integer>123</integer>
+    <key>accountId</key>
+    <integer>22</integer>
+    <key>key</key>
+    <string>YOUR KEY GOES HERE</string>
 </dict>
 </plist>
 
