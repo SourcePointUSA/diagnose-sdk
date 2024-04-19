@@ -84,10 +84,10 @@ struct SendEventResponse: Decodable {}
     var client: SPNetworkClient
 
     var baseUrl: URL {
-        URL(string: "https://njjydfm0r0.execute-api.eu-west-2.amazonaws.com")!
+        URL(string: "https://compliance-api.sp-redbud.com")!
     }
     var eventsUrl: URL {
-        URL(string: "/compliance-api/recordEvents/?_version=1.0.24", relativeTo: baseUrl)!
+        URL(string: "/recordEvents/?_version=1.0.70", relativeTo: baseUrl)!
     }
 
     init(
