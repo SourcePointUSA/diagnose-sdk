@@ -84,9 +84,6 @@
 		829EBC392BA3417F0063F156 /* SPDiagnose.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SPDiagnose.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		829EBC402BA3417F0063F156 /* SPDiagnoseTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SPDiagnoseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		829EBC642BA344190063F156 /* SPDiagnose+AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SPDiagnose+AppDelegate.swift"; sourceTree = "<group>"; };
-		829EBC672BA344190063F156 /* SPConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPConfig.swift; sourceTree = "<group>"; };
-		829EBC682BA344190063F156 /* SPLogger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPLogger.swift; sourceTree = "<group>"; };
-		829EBC692BA344190063F156 /* SPDiagnoseAPI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPDiagnoseAPI.swift; sourceTree = "<group>"; };
 		829EBC6A2BA344190063F156 /* SPDiagnose.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPDiagnose.swift; sourceTree = "<group>"; };
 		829EBC922BA3444A0063F156 /* SPDiagnoseTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPDiagnoseTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -195,20 +192,9 @@
 				8205F2262BA4A59800A47D82 /* api */,
 				8205F2212BA4A59800A47D82 /* objc */,
 				829EBC642BA344190063F156 /* SPDiagnose+AppDelegate.swift */,
-				829EBC662BA344190063F156 /* api */,
 				829EBC6A2BA344190063F156 /* SPDiagnose.swift */,
 			);
 			path = Sources;
-			sourceTree = "<group>";
-		};
-		829EBC662BA344190063F156 /* api */ = {
-			isa = PBXGroup;
-			children = (
-				829EBC672BA344190063F156 /* SPConfig.swift */,
-				829EBC682BA344190063F156 /* SPLogger.swift */,
-				829EBC692BA344190063F156 /* SPDiagnoseAPI.swift */,
-			);
-			path = api;
 			sourceTree = "<group>";
 		};
 		829EBC912BA3444A0063F156 /* Tests */ = {
