@@ -42,7 +42,12 @@ extension SPDiagnose {
         override init() {
             super.init()
 
-            NotificationCenter.default.addObserver(self, selector: #selector(onNotification(_:)), name: .SPDiagnoseNetworkIntercepted, object: nil)
+            NotificationCenter.default.addObserver(
+                self,
+                selector: #selector(onNotification(_:)),
+                name: .SPDiagnoseNetworkIntercepted,
+                object: nil
+            )
         }
 
         convenience init(onNetworkIntercepted: @escaping ((_ domain: String) -> Void)) {

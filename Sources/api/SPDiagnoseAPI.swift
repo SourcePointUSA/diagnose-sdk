@@ -44,34 +44,33 @@ struct SendEventResponse: Decodable {}
     let accountId, propertyId: Int
     let appName: String?
 
-    var client: SPNetworkClient
+    var client: HttpClient
+    var logger: SPLogger.Type?
 
-    var baseUrl: URL {
-        URL(string: "https://compliance-api.sp-redbud.com")!
-    }
-    var eventsUrl: URL {
-        URL(string: "/recordEvents/?_version=1.0.70", relativeTo: baseUrl)!
-    }
+    var baseUrl: URL { URL(string: "https://compliance-api.sp-redbud.com")! }
+    var eventsUrl: URL { URL(string: "/recordEvents/?_version=1.0.70", relativeTo: baseUrl)! }
 
     init(
         accountId: Int,
         propertyId: Int,
         appName: String?,
         key: String,
-        client: SPNetworkClient? = nil
+        client: HttpClient? = nil,
+        logger: SPLogger.Type = SPLogger.self
     ) {
         self.accountId = accountId
         self.propertyId = propertyId
         self.appName = appName
         guard let client = client else {
-            self.client = SPNetworkClient(auth: key)
+            self.client = SPHttpClient(auth: key)
             return
         }
         self.client = client
+        self.logger = logger
     }
 
     func getConfig() {
-        SPLogger.log("DiagnoseAPI.getConfig()")
+        logger?.log("DiagnoseAPI.getConfig()")
     }
 
     func sendEvent(_ event: SPDiagnose.Event) async {
@@ -97,7 +96,7 @@ struct SendEventResponse: Decodable {}
                         )
             }
         } catch {
-            SPLogger.log("failed to sendEvent: \( error.localizedDescription)")
+            logger?.log("failed to sendEvent: \( error.localizedDescription)")
         }
     }
 }

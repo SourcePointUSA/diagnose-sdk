@@ -8,6 +8,7 @@
 import Foundation
 
 protocol HttpClient {
+    init(auth: String, logger: SPLogger.Type)
     func put<Body: Encodable, Response: Decodable>(_ url: URL, body: Body) async throws -> Response
 }
 
@@ -25,7 +26,7 @@ class SPHttpClient: HttpClient {
         return JSONDecoder()
     }()
 
-    init(auth: String, logger: SPLogger.Type = SPLogger.self) {
+    required init(auth: String, logger: SPLogger.Type = SPLogger.self) {
         self.auth = auth
         self.logger = logger
     }
