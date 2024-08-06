@@ -48,6 +48,7 @@ struct SendEventRequest: Encodable {
     let accountId, propertyId: Int
     let appName: String?
     let events: [Event]
+    let sessionId: UUID
 }
 
 struct SendEventResponse: Decodable {}
@@ -55,6 +56,7 @@ struct SendEventResponse: Decodable {}
 @objcMembers class SPDiagnoseAPI: NSObject {
     let accountId, propertyId: Int
     let appName: String?
+    lazy var sessionId = UUID()
 
     var client: HttpClient
     var logger: SPLogger.Type?
@@ -114,7 +116,8 @@ struct SendEventResponse: Decodable {}
                     accountId: accountId,
                     propertyId: propertyId,
                     appName: appName,
-                    events: events
+                    events: events,
+                    sessionId: sessionId
                 )
             )
         } catch {
