@@ -7,43 +7,6 @@
 
 import Foundation
 
-class SPNetworkClient {
-    let auth: String
-
-    init(auth: String) {
-        self.auth = auth
-    }
-
-    func put<Body: Encodable, Response: Decodable>(_ url: URL, body: Body) async throws -> Response {
-        var request = URLRequest(url: url)
-        request.httpMethod = "PUT"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(auth)", forHTTPHeaderField: "Authorization")
-        do {
-            let encoder = JSONEncoder()
-            let body = try encoder.encode(body)
-            request.httpBody = body
-            SPLogger.log(String(data: body, encoding: .utf8) ?? "")
-        } catch {
-            throw error
-        }
-
-        let (data, response) = try await URLSession.shared.data(for: request)
-
-        guard let httpResponse = response as? HTTPURLResponse,
-              (200...299).contains(httpResponse.statusCode) else {
-            throw URLError(.badServerResponse)
-        }
-
-        let decoder = JSONDecoder()
-        if let responseData = try? decoder.decode(Response.self, from: data) {
-            return responseData
-        } else {
-            throw URLError(.cannotParseResponse)
-        }
-    }
-}
-
 enum Event: Encodable {
     case network(ts: Int, data: NetworkEvent, type: String = "network")
 

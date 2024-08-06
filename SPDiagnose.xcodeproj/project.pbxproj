@@ -25,6 +25,7 @@
 		829EBC952BA3447E0063F156 /* SPDiagnoseTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 829EBC922BA3444A0063F156 /* SPDiagnoseTests.swift */; };
 		82C5AEDD2BA3490C00850FC9 /* SPDiagnose+AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 829EBC642BA344190063F156 /* SPDiagnose+AppDelegate.swift */; };
 		82C5AEDE2BA3491400850FC9 /* SPDiagnose.swift in Sources */ = {isa = PBXBuildFile; fileRef = 829EBC6A2BA344190063F156 /* SPDiagnose.swift */; };
+		82D9691C2C622EA80073790F /* SPHttpClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82D9691B2C622EA80073790F /* SPHttpClient.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -86,6 +87,7 @@
 		829EBC642BA344190063F156 /* SPDiagnose+AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SPDiagnose+AppDelegate.swift"; sourceTree = "<group>"; };
 		829EBC6A2BA344190063F156 /* SPDiagnose.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPDiagnose.swift; sourceTree = "<group>"; };
 		829EBC922BA3444A0063F156 /* SPDiagnoseTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SPDiagnoseTests.swift; sourceTree = "<group>"; };
+		82D9691B2C622EA80073790F /* SPHttpClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SPHttpClient.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,6 +132,7 @@
 				8205F2272BA4A59800A47D82 /* SPConfig.swift */,
 				8205F2282BA4A59800A47D82 /* SPLogger.swift */,
 				8205F2292BA4A59800A47D82 /* SPDiagnoseAPI.swift */,
+				82D9691B2C622EA80073790F /* SPHttpClient.swift */,
 			);
 			path = api;
 			sourceTree = "<group>";
@@ -368,6 +371,7 @@
 				8205F22F2BA4A59800A47D82 /* SPDiagnoseAPI.swift in Sources */,
 				82C5AEDD2BA3490C00850FC9 /* SPDiagnose+AppDelegate.swift in Sources */,
 				8205F22E2BA4A59800A47D82 /* SPLogger.swift in Sources */,
+				82D9691C2C622EA80073790F /* SPHttpClient.swift in Sources */,
 				82C5AEDE2BA3491400850FC9 /* SPDiagnose.swift in Sources */,
 				8205F22D2BA4A59800A47D82 /* SPConfig.swift in Sources */,
 			);
