@@ -14,7 +14,14 @@ struct iOSExampleApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(
+                acceptAll: {
+                    Task { await appDelegate.diagnose?.consentEvent(action: .acceptAll) }
+                },
+                rejectAll: {
+                    Task { await appDelegate.diagnose?.consentEvent(action: .rejectAll) }
+                }
+            )
         }
     }
 }

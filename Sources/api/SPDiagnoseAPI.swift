@@ -7,50 +7,16 @@
 
 import Foundation
 
-class SPNetworkClient {
-    let auth: String
-
-    init(auth: String) {
-        self.auth = auth
-    }
-
-    func put<Body: Encodable, Response: Decodable>(_ url: URL, body: Body) async throws -> Response {
-        var request = URLRequest(url: url)
-        request.httpMethod = "PUT"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(auth)", forHTTPHeaderField: "Authorization")
-        do {
-            let encoder = JSONEncoder()
-            let body = try encoder.encode(body)
-            request.httpBody = body
-            SPLogger.log(String(data: body, encoding: .utf8) ?? "")
-        } catch {
-            throw error
-        }
-
-        let (data, response) = try await URLSession.shared.data(for: request)
-
-        guard let httpResponse = response as? HTTPURLResponse,
-              (200...299).contains(httpResponse.statusCode) else {
-            throw URLError(.badServerResponse)
-        }
-
-        let decoder = JSONDecoder()
-        if let responseData = try? decoder.decode(Response.self, from: data) {
-            return responseData
-        } else {
-            throw URLError(.cannotParseResponse)
-        }
-    }
-}
-
 enum Event: Encodable {
-    case network(ts: Int, data: NetworkEvent, type: String = "network")
+    case network(ts: Int, data: NetworkEventData, type: String = "network")
+    case consent(ts: Int, data: ConsentEventData, type: String = "consent")
 
     enum NetworkCodingKeys: CodingKey {
-        case ts
-        case data
-        case type
+        case ts, data, type
+    }
+
+    enum ConsentCodingKeys: CodingKey {
+        case ts, data, type
     }
 
     func encode(to encoder: Encoder) throws {
@@ -60,13 +26,22 @@ enum Event: Encodable {
                 try container.encode(ts, forKey: NetworkCodingKeys.ts)
                 try container.encode(data, forKey: NetworkCodingKeys.data)
                 try container.encode(type, forKey: NetworkCodingKeys.type)
+            case .consent(let ts, let data, let type):
+                var container = encoder.container(keyedBy: ConsentCodingKeys.self)
+                try container.encode(ts, forKey: ConsentCodingKeys.ts)
+                try container.encode(data, forKey: ConsentCodingKeys.data)
+                try container.encode(type, forKey: ConsentCodingKeys.type)
         }
     }
 }
 
-struct NetworkEvent: Encodable {
+struct NetworkEventData: Encodable {
     let domain: String
     let gdprTCString: String?
+}
+
+struct ConsentEventData: Encodable {
+    let consentAction: SPDiagnose.ConsentAction
 }
 
 struct SendEventRequest: Encodable {
@@ -81,60 +56,69 @@ struct SendEventResponse: Decodable {}
     let accountId, propertyId: Int
     let appName: String?
 
-    var client: SPNetworkClient
+    var client: HttpClient
+    var logger: SPLogger.Type?
 
-    var baseUrl: URL {
-        URL(string: "https://compliance-api.sp-redbud.com")!
-    }
-    var eventsUrl: URL {
-        URL(string: "/recordEvents/?_version=1.0.70", relativeTo: baseUrl)!
-    }
+    var baseUrl: URL { URL(string: "https://compliance-api.sp-redbud.com")! }
+    var eventsUrl: URL { URL(string: "/recordEvents/?_version=1.0.70", relativeTo: baseUrl)! }
 
     init(
         accountId: Int,
         propertyId: Int,
         appName: String?,
         key: String,
-        client: SPNetworkClient? = nil
+        client: HttpClient? = nil,
+        logger: SPLogger.Type = SPLogger.self
     ) {
         self.accountId = accountId
         self.propertyId = propertyId
         self.appName = appName
         guard let client = client else {
-            self.client = SPNetworkClient(auth: key)
+            self.client = SPHttpClient(auth: key)
             return
         }
         self.client = client
+        self.logger = logger
     }
 
     func getConfig() {
-        SPLogger.log("DiagnoseAPI.getConfig()")
+        logger?.log("DiagnoseAPI.getConfig()")
     }
 
     func sendEvent(_ event: SPDiagnose.Event) async {
         do {
+            var events: [Event] = []
+            let timestamp = Int(Date.now.timeIntervalSince1970)
             switch event {
-                case .network(let domain, let tcString):
-                    let _: SendEventResponse? = try await client
-                        .put(eventsUrl,
-                             body: SendEventRequest(
-                                accountId: accountId,
-                                propertyId: propertyId,
-                                appName: appName,
-                                events: [
-                                    .network(
-                                        ts: Int(Date.now.timeIntervalSince1970),
-                                        data: .init(
-                                            domain: domain,
-                                            gdprTCString: tcString
-                                        )
-                                    )
-                                ]
-                             )
+                case .network(let domain, let tcString): 
+                    events.append(
+                        .network(
+                            ts: timestamp,
+                            data: .init(
+                                domain: domain,
+                                gdprTCString: tcString
+                            )
                         )
+                    )
+                case .consent(let action):
+                    events.append(
+                        .consent(
+                            ts: timestamp,
+                            data: .init(consentAction: action)
+                        )
+                    )
             }
+            let _: SendEventResponse? = try await client.put(
+                eventsUrl,
+                body: SendEventRequest(
+                    accountId: accountId,
+                    propertyId: propertyId,
+                    appName: appName,
+                    events: events
+                )
+            )
         } catch {
-            SPLogger.log("failed to sendEvent: \( error.localizedDescription)")
+            logger?.log("failed to sendEvent: \( error.localizedDescription)")
         }
     }
 }

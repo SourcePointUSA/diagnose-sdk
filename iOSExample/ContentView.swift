@@ -15,18 +15,35 @@ func sendRequestTo(_ url: String) {
 }
 
 struct ContentView: View {
+    var acceptAll: () -> Void
+    var rejectAll: () -> Void
+
+    init(
+        acceptAll: @escaping () -> Void,
+        rejectAll: @escaping () -> Void
+    ) {
+        self.acceptAll = acceptAll
+        self.rejectAll = rejectAll
+    }
+
     var body: some View {
         VStack {
             Button(action: {
                 sendRequestTo("https://sourcepoint.com")
             }, label: {
                 Text("Request using URLSession")
-            })
+            }).padding()
+            Button(action: acceptAll, label: {
+                Text("Accept All")
+            }).padding()
+            Button(action: rejectAll, label: {
+                Text("Reject All")
+            }).padding()
         }
         .padding()
     }
 }
 
 #Preview {
-    ContentView()
+    ContentView {} rejectAll: {}
 }
