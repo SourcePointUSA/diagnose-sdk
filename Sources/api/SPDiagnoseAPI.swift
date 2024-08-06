@@ -8,12 +8,15 @@
 import Foundation
 
 enum Event: Encodable {
-    case network(ts: Int, data: NetworkEvent, type: String = "network")
+    case network(ts: Int, data: NetworkEventData, type: String = "network")
+    case consent(ts: Int, data: ConsentEventData, type: String = "consent")
 
     enum NetworkCodingKeys: CodingKey {
-        case ts
-        case data
-        case type
+        case ts, data, type
+    }
+
+    enum ConsentCodingKeys: CodingKey {
+        case ts, data, type
     }
 
     func encode(to encoder: Encoder) throws {
@@ -23,13 +26,22 @@ enum Event: Encodable {
                 try container.encode(ts, forKey: NetworkCodingKeys.ts)
                 try container.encode(data, forKey: NetworkCodingKeys.data)
                 try container.encode(type, forKey: NetworkCodingKeys.type)
+            case .consent(let ts, let data, let type):
+                var container = encoder.container(keyedBy: ConsentCodingKeys.self)
+                try container.encode(ts, forKey: ConsentCodingKeys.ts)
+                try container.encode(data, forKey: ConsentCodingKeys.data)
+                try container.encode(type, forKey: ConsentCodingKeys.type)
         }
     }
 }
 
-struct NetworkEvent: Encodable {
+struct NetworkEventData: Encodable {
     let domain: String
     let gdprTCString: String?
+}
+
+struct ConsentEventData: Encodable {
+    let consentAction: SPDiagnose.ConsentAction
 }
 
 struct SendEventRequest: Encodable {
@@ -75,26 +87,36 @@ struct SendEventResponse: Decodable {}
 
     func sendEvent(_ event: SPDiagnose.Event) async {
         do {
+            var events: [Event] = []
+            let timestamp = Int(Date.now.timeIntervalSince1970)
             switch event {
-                case .network(let domain, let tcString):
-                    let _: SendEventResponse? = try await client
-                        .put(eventsUrl,
-                             body: SendEventRequest(
-                                accountId: accountId,
-                                propertyId: propertyId,
-                                appName: appName,
-                                events: [
-                                    .network(
-                                        ts: Int(Date.now.timeIntervalSince1970),
-                                        data: .init(
-                                            domain: domain,
-                                            gdprTCString: tcString
-                                        )
-                                    )
-                                ]
-                             )
+                case .network(let domain, let tcString): 
+                    events.append(
+                        .network(
+                            ts: timestamp,
+                            data: .init(
+                                domain: domain,
+                                gdprTCString: tcString
+                            )
                         )
+                    )
+                case .consent(let action):
+                    events.append(
+                        .consent(
+                            ts: timestamp,
+                            data: .init(consentAction: action)
+                        )
+                    )
             }
+            let _: SendEventResponse? = try await client.put(
+                eventsUrl,
+                body: SendEventRequest(
+                    accountId: accountId,
+                    propertyId: propertyId,
+                    appName: appName,
+                    events: events
+                )
+            )
         } catch {
             logger?.log("failed to sendEvent: \( error.localizedDescription)")
         }

@@ -10,10 +10,31 @@ extension SPDiagnose {
         var description: String {
             switch self {
                 case .network(let domain, let tcString): "Event.network(domain: \(domain), tcString: \(tcString as Any))"
+                case .consent(let action): "Event.consent(action: \(action))"
             }
         }
 
         case network(domain: String, tcString: String?)
+        case consent(action: ConsentAction)
+    }
+
+    @objc public enum ConsentAction: Int, Encodable, CustomStringConvertible {
+        public var description: String {
+            switch self {
+                case .acceptAll: return "ConsentAction.acceptAll"
+                case .rejectAll: return "ConsentAction.rejectAll"
+            }
+        }
+
+        case acceptAll, rejectAll
+
+        public func encode(to encoder: any Encoder) throws {
+            var container = encoder.singleValueContainer()
+            switch self {
+                case .acceptAll: try container.encode("acceptAll")
+                case .rejectAll: try container.encode("rejectAll")
+            }
+        }
     }
 
     @objcMembers class NetworkLogger: URLProtocol {
@@ -122,5 +143,9 @@ extension SPDiagnose {
     convenience public init(sessionConfigs: [URLSessionConfiguration]) {
         self.init()
         sessionConfigs.forEach { Self.injectLogger(configuration: $0) }
+    }
+
+    public func consentEvent(action: SPDiagnose.ConsentAction) async {
+        await api.sendEvent(.consent(action: action))
     }
 }
