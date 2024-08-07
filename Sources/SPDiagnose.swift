@@ -118,13 +118,14 @@ extension SPDiagnose {
         self.api = dApi
         self.networkSubscriber = NetworkSubscriber { domain in
             Task {
-                // TODO: filter out our own network calls
-                await dApi.sendEvent(
-                    .network(
-                        domain: domain,
-                        tcString: UserDefaults.standard.string(forKey: "IABTCF_TCString")
+                if (domain != SPDiagnoseAPI.baseUrl.host) {
+                    await dApi.sendEvent(
+                        .network(
+                            domain: domain,
+                            tcString: UserDefaults.standard.string(forKey: "IABTCF_TCString")
+                        )
                     )
-                )
+                }
             }
         }
     }
