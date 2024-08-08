@@ -16,10 +16,10 @@ struct iOSExampleApp: App {
         WindowGroup {
             ContentView(
                 acceptAll: {
-                    Task { await appDelegate.diagnose?.consentEvent(action: .acceptAll) }
+                    Task { await appDelegate.diagnose.consentEvent(action: .acceptAll) }
                 },
                 rejectAll: {
-                    Task { await appDelegate.diagnose?.consentEvent(action: .rejectAll) }
+                    Task { await appDelegate.diagnose.consentEvent(action: .rejectAll) }
                 }
             )
         }

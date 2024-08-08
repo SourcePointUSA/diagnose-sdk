@@ -9,10 +9,5 @@ import Foundation
 import UIKit
 
 public class SPDiagnoseAppDelegate: NSObject, UIApplicationDelegate {
-    public var diagnose: SPDiagnose?
-
-    public func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-        diagnose = SPDiagnose()
-        return true
-    }
+    public var diagnose: SPDiagnose = SPDiagnose()
 }
