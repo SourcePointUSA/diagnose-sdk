@@ -89,10 +89,6 @@ extension SPDiagnose {
     let api: SPDiagnoseAPI
     let networkSubscriber: NetworkSubscriber
 
-    static func injectLogger() {
-        injectLogger(configuration: URLSessionConfiguration.default)
-    }
-
     @objc public static func injectLogger(configuration: URLSessionConfiguration) {
         URLProtocol.registerClass(NetworkLogger.self)
         let protocols = configuration.protocolClasses ?? []
@@ -101,8 +97,7 @@ extension SPDiagnose {
         }
     }
 
-    public override init() {
-        Self.injectLogger()
+    convenience public override init() {
         let config: SPConfig!
         do {
             config = try SPConfig()
@@ -110,17 +105,16 @@ extension SPDiagnose {
             fatalError("\(error)")
         }
 
-        let dApi = SPDiagnoseAPI(
+        let api = SPDiagnoseAPI(
             accountId: config.accountId,
             propertyId: config.propertyId,
             appName: config.appName,
             key: config.key
         )
-        self.api = dApi
-        self.networkSubscriber = NetworkSubscriber { domain in
+        let subscriber = NetworkSubscriber { domain in
             Task {
                 if (domain != SPDiagnoseAPI.baseUrl.host) {
-                    await dApi.sendEvent(
+                    await api.sendEvent(
                         .network(
                             domain: domain,
                             tcString: UserDefaults.standard.string(forKey: "IABTCF_TCString")
@@ -129,22 +123,13 @@ extension SPDiagnose {
                 }
             }
         }
+        self.init(api: api, subscriber: subscriber)
     }
 
     init(api: SPDiagnoseAPI, subscriber: NetworkSubscriber) {
-        Self.injectLogger()
+        Self.injectLogger(configuration: URLSessionConfiguration.default)
         self.api = api
         self.networkSubscriber = subscriber
-    }
-
-    convenience public init(sessionConfig: URLSessionConfiguration) {
-        self.init()
-        Self.injectLogger(configuration: sessionConfig)
-    }
-
-    convenience public init(sessionConfigs: [URLSessionConfiguration]) {
-        self.init()
-        sessionConfigs.forEach { Self.injectLogger(configuration: $0) }
     }
 
     public func consentEvent(action: SPDiagnose.ConsentAction) async {
