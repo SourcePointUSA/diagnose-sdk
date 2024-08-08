@@ -37,13 +37,9 @@ extension SPDiagnose {
         }
     }
 
-    @objcMembers class NetworkLogger: URLProtocol {
-        static var domains = Set<String>()
-
-        override class func canInit(with request: URLRequest) -> Bool {
-            if let domain = request.url?.host, !domains.contains(domain) {
-                domains.insert(domain)
-
+    @objcMembers public class NetworkLogger: URLProtocol {
+        override class public func canInit(with request: URLRequest) -> Bool {
+            if let domain = request.url?.host {
                 SPLogger.log("Request captured: \(domain)")
 
                 NotificationCenter.default.post(
@@ -52,7 +48,12 @@ extension SPDiagnose {
                     userInfo: ["domain": domain]
                 )
             }
+            return false
+        }
 
+        /// we need to override `canInit(with task:)` otherwise `canInit(with request:)`
+        /// gets called multiple times
+        public override class func canInit(with task: URLSessionTask) -> Bool {
             return false
         }
     }
