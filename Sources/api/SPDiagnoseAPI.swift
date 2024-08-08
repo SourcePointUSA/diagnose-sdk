@@ -48,6 +48,7 @@ struct SendEventRequest: Encodable {
     let accountId, propertyId: Int
     let appName: String?
     let events: [Event]
+    let sessionId: UUID
 }
 
 struct SendEventResponse: Decodable {}
@@ -55,12 +56,13 @@ struct SendEventResponse: Decodable {}
 @objcMembers class SPDiagnoseAPI: NSObject {
     let accountId, propertyId: Int
     let appName: String?
+    lazy var sessionId = UUID()
 
     var client: HttpClient
     var logger: SPLogger.Type?
 
-    var baseUrl: URL { URL(string: "https://compliance-api.sp-redbud.com")! }
-    var eventsUrl: URL { URL(string: "/recordEvents/?_version=1.0.70", relativeTo: baseUrl)! }
+    public static var baseUrl: URL { URL(string: "https://compliance-api.sp-redbud.com")! }
+    static var eventsUrl: URL { URL(string: "/recordEvents/?_version=1.0.70", relativeTo: baseUrl)! }
 
     init(
         accountId: Int,
@@ -109,12 +111,13 @@ struct SendEventResponse: Decodable {}
                     )
             }
             let _: SendEventResponse? = try await client.put(
-                eventsUrl,
+                Self.eventsUrl,
                 body: SendEventRequest(
                     accountId: accountId,
                     propertyId: propertyId,
                     appName: appName,
-                    events: events
+                    events: events,
+                    sessionId: sessionId
                 )
             )
         } catch {
