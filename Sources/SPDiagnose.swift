@@ -142,6 +142,8 @@ extension SPDiagnose {
     }
 
     public func consentEvent(action: SPDiagnose.ConsentAction) async {
-        await api.sendEvent(.consent(action: action))
+        if Sampling.shared.hit == true {
+            await api.sendEvent(.consent(action: action))
+        }
     }
 }
