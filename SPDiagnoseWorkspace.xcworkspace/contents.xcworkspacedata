@@ -4,4 +4,7 @@
    <FileRef
       location = "group:/Users/andreherculano/dev/sourcepoint/diagnose-sdk/SPDiagnose.xcodeproj">
    </FileRef>
+   <FileRef
+      location = "group:Tests/iOSExample.xctestplan">
+   </FileRef>
 </Workspace>

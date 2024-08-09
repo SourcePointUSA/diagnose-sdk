@@ -53,6 +53,10 @@ struct SendEventRequest: Encodable {
 
 struct SendEventResponse: Decodable {}
 
+struct GetMetaDataResponse: Decodable {
+    let samplingRate: Int
+}
+
 @objcMembers class SPDiagnoseAPI: NSObject {
     let accountId, propertyId: Int
     let appName: String?
@@ -63,6 +67,15 @@ struct SendEventResponse: Decodable {}
 
     public static var baseUrl: URL { URL(string: "https://compliance-api.sp-redbud.com")! }
     static var eventsUrl: URL { URL(string: "/recordEvents/?_version=1.0.70", relativeTo: baseUrl)! }
+    static var metaDataBaseUrl: URL { URL(string: "/meta-data/?_version=1.0.70", relativeTo: baseUrl)! }
+
+    var metaDataUrl: URL {
+        Self.metaDataBaseUrl.appending(params: [
+            "accountId": String(accountId),
+            "propertyId": String(propertyId),
+            "appName": appName
+        ])!
+    }
 
     init(
         accountId: Int,
@@ -121,7 +134,26 @@ struct SendEventResponse: Decodable {}
                 )
             )
         } catch {
-            logger?.log("failed to sendEvent: \( error.localizedDescription)")
+            logger?.log("failed to sendEvent: \(error.localizedDescription)")
         }
+    }
+
+    func getMetaData() async throws -> GetMetaDataResponse {
+        do {
+            return try await client.get(metaDataUrl)
+        } catch {
+            SPLogger.log("failed to getMetaData: \(error.localizedDescription)")
+            throw error
+        }
+    }
+}
+
+extension URL {
+    func appending(params: [String: String?]) -> URL? {
+        var components = URLComponents(url: self, resolvingAgainstBaseURL: true)
+        params.forEach {
+            components?.queryItems?.append(URLQueryItem(name: $0.key, value: $0.value))
+        }
+        return components?.url
     }
 }

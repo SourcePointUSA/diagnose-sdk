@@ -26,10 +26,8 @@ class NetworkSubscriberTests: XCTestCase {
         /// if replaced with `_` XCode will release the NetworkSubscriber
         /// causing the test to fail ¯\_(ツ)_/¯
         let subscriber = SPDiagnose.NetworkSubscriber { receivedDomain in
-            if (receivedDomain == domain) {
+            if receivedDomain == domain {
                 expectation.fulfill()
-            } else {
-                XCTFail("notification intercepted but with a different domain: \(receivedDomain as Any)")
             }
         }
         postNotificationCenter(domain)

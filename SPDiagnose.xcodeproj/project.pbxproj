@@ -28,6 +28,9 @@
 		82D9691C2C622EA80073790F /* SPHttpClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82D9691B2C622EA80073790F /* SPHttpClient.swift */; };
 		82D9691E2C64C7440073790F /* NetworkLoggerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82D9691D2C64C7440073790F /* NetworkLoggerTests.swift */; };
 		82D969202C64CD890073790F /* NetworkSubscriberTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82D9691F2C64CD890073790F /* NetworkSubscriberTests.swift */; };
+		82D969222C64D86C0073790F /* Diagnose+Sampling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82D969212C64D86C0073790F /* Diagnose+Sampling.swift */; };
+		82D969252C64D9AD0073790F /* SamplingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82D969232C64D9710073790F /* SamplingTests.swift */; };
+		82D969272C6616AE0073790F /* UserDefaults+SPDiagnose.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82D969262C6616AE0073790F /* UserDefaults+SPDiagnose.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -92,6 +95,9 @@
 		82D9691B2C622EA80073790F /* SPHttpClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SPHttpClient.swift; sourceTree = "<group>"; };
 		82D9691D2C64C7440073790F /* NetworkLoggerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkLoggerTests.swift; sourceTree = "<group>"; };
 		82D9691F2C64CD890073790F /* NetworkSubscriberTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkSubscriberTests.swift; sourceTree = "<group>"; };
+		82D969212C64D86C0073790F /* Diagnose+Sampling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Diagnose+Sampling.swift"; sourceTree = "<group>"; };
+		82D969232C64D9710073790F /* SamplingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SamplingTests.swift; sourceTree = "<group>"; };
+		82D969262C6616AE0073790F /* UserDefaults+SPDiagnose.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+SPDiagnose.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -200,6 +206,8 @@
 				8205F2212BA4A59800A47D82 /* objc */,
 				829EBC642BA344190063F156 /* SPDiagnose+AppDelegate.swift */,
 				829EBC6A2BA344190063F156 /* SPDiagnose.swift */,
+				82D969212C64D86C0073790F /* Diagnose+Sampling.swift */,
+				82D969262C6616AE0073790F /* UserDefaults+SPDiagnose.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -210,6 +218,7 @@
 				829EBC922BA3444A0063F156 /* SPDiagnoseTests.swift */,
 				82D9691D2C64C7440073790F /* NetworkLoggerTests.swift */,
 				82D9691F2C64CD890073790F /* NetworkSubscriberTests.swift */,
+				82D969232C64D9710073790F /* SamplingTests.swift */,
 			);
 			path = Tests;
 			sourceTree = "<group>";
@@ -374,11 +383,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				8205F22C2BA4A59800A47D82 /* SPDiagnoseSwizzler.m in Sources */,
+				82D969272C6616AE0073790F /* UserDefaults+SPDiagnose.swift in Sources */,
 				8205F22F2BA4A59800A47D82 /* SPDiagnoseAPI.swift in Sources */,
 				82C5AEDD2BA3490C00850FC9 /* SPDiagnose+AppDelegate.swift in Sources */,
 				8205F22E2BA4A59800A47D82 /* SPLogger.swift in Sources */,
 				82D9691C2C622EA80073790F /* SPHttpClient.swift in Sources */,
 				82C5AEDE2BA3491400850FC9 /* SPDiagnose.swift in Sources */,
+				82D969222C64D86C0073790F /* Diagnose+Sampling.swift in Sources */,
 				8205F22D2BA4A59800A47D82 /* SPConfig.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -387,6 +398,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				82D969252C64D9AD0073790F /* SamplingTests.swift in Sources */,
 				829EBC952BA3447E0063F156 /* SPDiagnoseTests.swift in Sources */,
 				82D969202C64CD890073790F /* NetworkSubscriberTests.swift in Sources */,
 				82D9691E2C64C7440073790F /* NetworkLoggerTests.swift in Sources */,

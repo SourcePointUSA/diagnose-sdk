@@ -1,6 +1,5 @@
 import Foundation
 
-
 extension Notification.Name {
     static let SPDiagnoseNetworkIntercepted = Notification.Name("SPDiagnoseNetworkIntercepted")
 }
@@ -87,11 +86,7 @@ extension SPDiagnose {
 
 @objcMembers public class SPDiagnose: NSObject {
     let api: SPDiagnoseAPI
-    let networkSubscriber: NetworkSubscriber
-
-    static func injectLogger() {
-        injectLogger(configuration: URLSessionConfiguration.default)
-    }
+    var networkSubscriber: NetworkSubscriber?
 
     @objc public static func injectLogger(configuration: URLSessionConfiguration) {
         URLProtocol.registerClass(NetworkLogger.self)
@@ -101,8 +96,7 @@ extension SPDiagnose {
         }
     }
 
-    public override init() {
-        Self.injectLogger()
+    convenience public override init() {
         let config: SPConfig!
         do {
             config = try SPConfig()
@@ -110,17 +104,16 @@ extension SPDiagnose {
             fatalError("\(error)")
         }
 
-        let dApi = SPDiagnoseAPI(
+        let api = SPDiagnoseAPI(
             accountId: config.accountId,
             propertyId: config.propertyId,
             appName: config.appName,
             key: config.key
         )
-        self.api = dApi
-        self.networkSubscriber = NetworkSubscriber { domain in
+        let subscriber = NetworkSubscriber { domain in
             Task {
-                if (domain != SPDiagnoseAPI.baseUrl.host) {
-                    await dApi.sendEvent(
+                if domain != SPDiagnoseAPI.baseUrl.host {
+                    await api.sendEvent(
                         .network(
                             domain: domain,
                             tcString: UserDefaults.standard.string(forKey: "IABTCF_TCString")
@@ -129,25 +122,28 @@ extension SPDiagnose {
                 }
             }
         }
+        self.init(api: api, subscriber: nil)
+        sampleAndSubscribe(subscriber)
     }
 
-    init(api: SPDiagnoseAPI, subscriber: NetworkSubscriber) {
-        Self.injectLogger()
+    func sampleAndSubscribe(_ subscriber: NetworkSubscriber) {
+        Task(priority: .high) {
+            let response = try await api.getMetaData()
+            if Sampling.shared.updateAndSample(newRate: response.samplingRate) == true {
+                self.networkSubscriber = subscriber
+            }
+        }
+    }
+
+    init(api: SPDiagnoseAPI, subscriber: NetworkSubscriber?) {
+        Self.injectLogger(configuration: URLSessionConfiguration.default)
         self.api = api
         self.networkSubscriber = subscriber
     }
 
-    convenience public init(sessionConfig: URLSessionConfiguration) {
-        self.init()
-        Self.injectLogger(configuration: sessionConfig)
-    }
-
-    convenience public init(sessionConfigs: [URLSessionConfiguration]) {
-        self.init()
-        sessionConfigs.forEach { Self.injectLogger(configuration: $0) }
-    }
-
     public func consentEvent(action: SPDiagnose.ConsentAction) async {
-        await api.sendEvent(.consent(action: action))
+        if Sampling.shared.hit == true {
+            await api.sendEvent(.consent(action: action))
+        }
     }
 }
