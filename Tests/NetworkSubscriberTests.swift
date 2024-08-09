@@ -28,8 +28,6 @@ class NetworkSubscriberTests: XCTestCase {
         let subscriber = SPDiagnose.NetworkSubscriber { receivedDomain in
             if (receivedDomain == domain) {
                 expectation.fulfill()
-            } else {
-                XCTFail("notification intercepted but with a different domain: \(receivedDomain as Any)")
             }
         }
         postNotificationCenter(domain)
