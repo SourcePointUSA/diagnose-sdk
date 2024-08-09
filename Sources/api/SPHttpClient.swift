@@ -10,6 +10,7 @@ import Foundation
 protocol HttpClient {
     init(auth: String, logger: SPLogger.Type)
     func put<Body: Encodable, Response: Decodable>(_ url: URL, body: Body) async throws -> Response
+    func get<Response: Decodable>(_ url: URL) async throws -> Response
 }
 
 class SPHttpClient: HttpClient {
@@ -56,7 +57,17 @@ class SPHttpClient: HttpClient {
             )
         )
     }
+
+    func get<Response: Decodable>(_ url: URL) async throws -> Response {
+        logger.log("request - GET \(url.absoluteString)")
+
+
+        return try parseResponse(
+            try await URLSession.shared.data(for: URLRequest(url: url, bearer: auth))
+        )
+    }
 }
+
 extension URLRequest {
     init(url: URL, method: String = "GET", bearer: String, body: Data? = nil) {
         self.init(url: url)
