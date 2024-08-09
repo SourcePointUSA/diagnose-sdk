@@ -11,6 +11,13 @@ extension SPDiagnose {
     struct Sampling {
         static let shared = Sampling()
 
+        /// pick a random number from 0 to 100 if the number picked is smaller than `rate`
+        /// return `true` otherwise
+        /// return `false`
+        static func sampleIt(rate: Int) -> Bool {
+            return 0...Int(rate) ~= Int.random(in: 0...100)
+        }
+
         let storage = UserDefaults.standard
 
         public enum StoreKeys: String {
@@ -33,6 +40,14 @@ extension SPDiagnose {
 
         func setHit(_ newValue: Bool?) {
             storage.set(newValue, forKey: StoreKeys.hit.rawValue)
+        }
+
+        func updateAndSample(newRate: Int) -> Bool? {
+            if newRate != rate {
+                setRate(newRate)
+                setHit(Self.sampleIt(rate: newRate))
+            }
+            return hit
         }
     }
 }
