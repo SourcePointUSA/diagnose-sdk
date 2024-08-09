@@ -61,6 +61,10 @@ class SPHttpClient: HttpClient {
     func get<Response: Decodable>(_ url: URL) async throws -> Response {
         logger.log("request - GET \(url.absoluteString)")
 
+        // TODO: remove when /meta-data is implemented
+        if url.absoluteString.contains("meta-data") {
+            return GetMetaDataResponse(samplingRate: 21) as! Response
+        }
 
         return try parseResponse(
             try await URLSession.shared.data(for: URLRequest(url: url, bearer: auth))
