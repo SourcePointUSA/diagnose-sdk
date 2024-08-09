@@ -39,7 +39,7 @@ class NetworkLoggerTests: XCTestCase {
         let expectation = XCTestExpectation(description: "NotificationCenter notified")
         observeNotificationCenter {
             let notifiedDomain = $0.userInfo?["domain"] as? String
-            if (notifiedDomain == domain) {
+            if notifiedDomain == domain {
                 expectation.fulfill()
             }
         }

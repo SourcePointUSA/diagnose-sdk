@@ -121,7 +121,7 @@ struct SendEventResponse: Decodable {}
                 )
             )
         } catch {
-            logger?.log("failed to sendEvent: \( error.localizedDescription)")
+            logger?.log("failed to sendEvent: \(error.localizedDescription)")
         }
     }
 }
