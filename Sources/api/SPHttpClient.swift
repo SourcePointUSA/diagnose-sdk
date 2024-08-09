@@ -31,22 +31,8 @@ class SPHttpClient: HttpClient {
         self.logger = logger
     }
 
-    func put<Body: Encodable, Response: Decodable>(_ url: URL, body: Body) async throws -> Response {
-        var request = URLRequest(url: url)
-        request.httpMethod = "PUT"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(auth)", forHTTPHeaderField: "Authorization")
-
-        do {
-            let body = try encoder.encode(body)
-            request.httpBody = body
-            logger.log(String(data: body, encoding: .utf8) ?? "")
-        } catch {
-            throw error
-        }
-
-        let (data, response) = try await URLSession.shared.data(for: request)
-
+    func parseResponse<Response: Decodable>(_ reqResponse: (Data, URLResponse)) throws -> Response {
+        let (data, response) = reqResponse
         guard let httpResponse = response as? HTTPURLResponse,
               (200...299).contains(httpResponse.statusCode) else {
             throw URLError(.badServerResponse)
@@ -57,5 +43,26 @@ class SPHttpClient: HttpClient {
         } else {
             throw URLError(.cannotParseResponse)
         }
+    }
+
+    func put<Body: Encodable, Response: Decodable>(_ url: URL, body: Body) async throws -> Response {
+        let encodedBody = try encoder.encode(body)
+        logger.log("request - PUT \(url.absoluteString)")
+        logger.log(String(data: encodedBody, encoding: .utf8) ?? "")
+
+        return try parseResponse(
+            try await URLSession.shared.data(
+                for: URLRequest(url: url, method: "PUT", bearer: auth, body: encodedBody)
+            )
+        )
+    }
+}
+extension URLRequest {
+    init(url: URL, method: String = "GET", bearer: String, body: Data? = nil) {
+        self.init(url: url)
+        httpMethod = method
+        setValue("application/json", forHTTPHeaderField: "Content-Type")
+        setValue("Bearer \(bearer)", forHTTPHeaderField: "Authorization")
+        httpBody = body
     }
 }
