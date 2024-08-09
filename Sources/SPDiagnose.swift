@@ -1,6 +1,5 @@
 import Foundation
 
-
 extension Notification.Name {
     static let SPDiagnoseNetworkIntercepted = Notification.Name("SPDiagnoseNetworkIntercepted")
 }
@@ -87,7 +86,7 @@ extension SPDiagnose {
 
 @objcMembers public class SPDiagnose: NSObject {
     let api: SPDiagnoseAPI
-    let networkSubscriber: NetworkSubscriber
+    var networkSubscriber: NetworkSubscriber?
 
     @objc public static func injectLogger(configuration: URLSessionConfiguration) {
         URLProtocol.registerClass(NetworkLogger.self)
@@ -113,7 +112,7 @@ extension SPDiagnose {
         )
         let subscriber = NetworkSubscriber { domain in
             Task {
-                if (domain != SPDiagnoseAPI.baseUrl.host) {
+                if domain != SPDiagnoseAPI.baseUrl.host {
                     await api.sendEvent(
                         .network(
                             domain: domain,
@@ -123,10 +122,20 @@ extension SPDiagnose {
                 }
             }
         }
-        self.init(api: api, subscriber: subscriber)
+        self.init(api: api, subscriber: nil)
+        sampleAndSubscribe(subscriber)
     }
 
-    init(api: SPDiagnoseAPI, subscriber: NetworkSubscriber) {
+    func sampleAndSubscribe(_ subscriber: NetworkSubscriber) {
+        Task(priority: .high) {
+            let response = try await api.getMetaData()
+            if Sampling.shared.updateAndSample(newRate: response.samplingRate) == true {
+                self.networkSubscriber = subscriber
+            }
+        }
+    }
+
+    init(api: SPDiagnoseAPI, subscriber: NetworkSubscriber?) {
         Self.injectLogger(configuration: URLSessionConfiguration.default)
         self.api = api
         self.networkSubscriber = subscriber
