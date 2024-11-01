@@ -10,6 +10,7 @@ import Foundation
 protocol HttpClient {
     init(auth: String, logger: SPLogger.Type)
     func put<Body: Encodable, Response: Decodable>(_ url: URL, body: Body) async throws -> Response
+    func post<Body: Encodable, Response: Decodable>(_ url: URL, body: Body) async throws -> Response
     func get<Response: Decodable>(_ url: URL) async throws -> Response
 }
 
@@ -38,8 +39,9 @@ class SPHttpClient: HttpClient {
               (200...299).contains(httpResponse.statusCode) else {
             throw URLError(.badServerResponse)
         }
-
         if let responseData = try? decoder.decode(Response.self, from: data) {
+            logger.log("response - \(httpResponse.url?.absoluteString ?? "")")
+            logger.log(String(data: data, encoding: .utf8) ?? "<empty response>")
             return responseData
         } else {
             throw URLError(.cannotParseResponse)
@@ -61,13 +63,18 @@ class SPHttpClient: HttpClient {
     func get<Response: Decodable>(_ url: URL) async throws -> Response {
         logger.log("request - GET \(url.absoluteString)")
 
-        // TODO: remove when /meta-data is implemented
-        if url.absoluteString.contains("meta-data") {
-            return GetMetaDataResponse(samplingRate: 21) as! Response
-        }
-
         return try parseResponse(
             try await URLSession.shared.data(for: URLRequest(url: url, bearer: auth))
+        )
+    }
+
+    func post<Body: Encodable, Response: Decodable>(_ url: URL, body: Body) async throws -> Response {
+        let encodedBody = try encoder.encode(body)
+        logger.log("request - POST \(url.absoluteString)")
+        logger.log(String(data: encodedBody, encoding: .utf8) ?? "")
+
+        return try parseResponse(
+            try await URLSession.shared.data(for: URLRequest(url: url, method: "POST", bearer: auth, body: encodedBody))
         )
     }
 }
