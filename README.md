@@ -24,6 +24,7 @@ In the following sections, we will cover the necessary steps to configure and in
 - [Declare Diagnose SDK as dependency](#declare-diagnose-sdk-as-dependency)
 - [Set up using SwiftUI](#set-up-using-swiftui)
 - [Set up using Storyboard](#set-up-using-storyboard)
+- [Signaling consent](#signaling-consent)
 
 ### `SPDiagnoseConfig.plist`
 
@@ -85,6 +86,18 @@ public class SPDiagnoseAppDelegate: NSObject, UIApplicationDelegate {
     }
 }
 ```
+
+### Signaling consent
+
+The Diagnose SDK is CMP agnostic by design. In order to determine the consent status of a given user, your app needs to call the method `updateConsent(status: SPDiagnose.ConsentStatus)`, ideally as soon as the user makes a consent choice (pressiong on a accept all vendors/purposes button for example).
+
+The `SPDiagnose.ConsentStatus` enum can assume the following values:
+* `noAction` -> that is the default consent status of a new user, or a user that has not yet made a consent choice.
+* `consentedAll` -> used to signal the user _accepted_ all vendors/purposes on a consent prompt.
+* `consentedSome` -> used to signal the user has accepted some, but not all, vendors/purposes on a consent prompt, ie. by enabling only some vendors.
+* `rejectedAll` -> used to signal the user _rejected_ all vendors/purposes on a consent prompt.
+
+_In the future, when integrate both Diagnose and Dialogue SDKs together, this step won't be necessary. The Dialogue SDK will automatically signal consent choice to Diagnose._
 
 ## FAQs
 
