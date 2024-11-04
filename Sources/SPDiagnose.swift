@@ -90,6 +90,13 @@ extension SPDiagnose {
     let logger = SPLogger.self
     var networkSubscriber: NetworkSubscriber?
 
+    var shouldGetConfig: Bool {
+        if let expiresOn = state.expireOn {
+            return expiresOn <= .now
+        }
+        return true // if state.expireOn is nil
+    }
+
     public var consentStatus: SPDiagnose.ConsentStatus { state.consentStatus }
 
     @objc public static func injectLogger(configuration: URLSessionConfiguration) {
@@ -138,9 +145,13 @@ extension SPDiagnose {
 
     func getAndUpdateConfig(completionHandler: @escaping () -> Void) {
         Task(priority: .high) {
+            if !shouldGetConfig {
+                logger.log("Skipping getConfig call because config is still valid. Expires on \(state.expireOn?.description ?? "")")
+                return
+            }
+
             if let propertyConfig = (try? await api.getConfig())?.data {
-//                _ = state.sampling.updateAndSample(newRate: propertyConfig.samplingRate)
-                _ = state.sampling.updateAndSample(newRate: 100)
+                state.sampling.updateAndSample(newRate: propertyConfig.samplingRate)
                 state.diagnoseAccountId = propertyConfig.diagnoseAccountId
                 state.diagnosePropertyId = propertyConfig.diagnosePropertyId
                 state.expireOn = propertyConfig.expireOn

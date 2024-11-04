@@ -29,12 +29,11 @@ extension SPDiagnose {
                 "Sampling(rate: \(rate)%, hit: \(hit?.description ?? ""))"
             }
 
-            mutating func updateAndSample(newRate: Int) -> Bool? {
+            mutating func updateAndSample(newRate: Int){
                 if newRate != rate {
                     rate = newRate
                     hit = Self.sampleIt(rate: newRate)
                 }
-                return hit
             }
         }
 
