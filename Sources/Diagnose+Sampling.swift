@@ -42,7 +42,7 @@ extension SPDiagnose {
         static let storage = UserDefaults.standard
 
         public enum StoreKeys: String {
-            case rate = "sp.diagnose.state"
+            case state = "sp.diagnose.state"
         }
 
         var sampling: Sampling = Sampling(rate: 0)
@@ -63,7 +63,7 @@ extension SPDiagnose {
         }
 
         private init() {
-            if let storedData = Self.storage.data(forKey: Self.StoreKeys.rate.rawValue),
+            if let storedData = Self.storage.data(forKey: Self.StoreKeys.state.rawValue),
                let decoded = try? JSONDecoder().decode(Self.self, from: storedData)
             {
                 SPLogger.log("Stored state: \(decoded)")
@@ -77,7 +77,7 @@ extension SPDiagnose {
             logSamplingState()
             Self.storage.setValue(
                 try? JSONEncoder().encode(self),
-                forKey: Self.StoreKeys.rate.rawValue
+                forKey: Self.StoreKeys.state.rawValue
             )
             Self.storage.synchronize()
         }
