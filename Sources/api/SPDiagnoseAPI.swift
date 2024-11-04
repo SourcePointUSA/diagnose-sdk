@@ -8,34 +8,26 @@
 import Foundation
 
 enum Event: Encodable {
-    case network(ts: Int, sessionId: UUID, requestCount: Int, consentStatus: SPDiagnose.ConsentStatus, data: NetworkEventData, type: String = "network")
-    case consent(ts: Int, sessionId: UUID, requestCount: Int, consentStatus: SPDiagnose.ConsentStatus, data: ConsentEventData, type: String = "consent")
+    case network(sessionId: UUID, requestCount: Int, consentStatus: SPDiagnose.ConsentStatus, data: NetworkEventData, type: String = "network")
+    case consent(sessionId: UUID, requestCount: Int, consentStatus: SPDiagnose.ConsentStatus, data: ConsentEventData, type: String = "consent")
 
-    enum NetworkCodingKeys: String, CodingKey {
-        case ts, data, type, sessionId
-        case consentStatus = "consent_status"
-        case requestCount = "req"
-    }
-
-    enum ConsentCodingKeys: String, CodingKey {
-        case ts, data, type, sessionId
+    enum CodingKeys: String, CodingKey {
+        case data, type, sessionId
         case consentStatus = "consent_status"
         case requestCount = "req"
     }
 
     func encode(to encoder: Encoder) throws {
         switch self {
-            case .network(let ts, let sessionId, let requestCount, let consentStatus, let data, let type):
-                var container = encoder.container(keyedBy: NetworkCodingKeys.self)
-                try container.encode(ts, forKey: .ts)
+            case .network(let sessionId, let requestCount, let consentStatus, let data, let type):
+                var container = encoder.container(keyedBy: CodingKeys.self)
                 try container.encode(data, forKey: .data)
                 try container.encode(type, forKey: .type)
                 try container.encode(sessionId, forKey: .sessionId)
                 try container.encode(requestCount, forKey: .requestCount)
                 try container.encode(consentStatus, forKey: .consentStatus)
-            case .consent(let ts, let sessionId, let requestCount, let consentStatus, let data, let type):
-                var container = encoder.container(keyedBy: ConsentCodingKeys.self)
-                try container.encode(ts, forKey: .ts)
+            case .consent(let sessionId, let requestCount, let consentStatus, let data, let type):
+                var container = encoder.container(keyedBy: CodingKeys.self)
                 try container.encode(data, forKey: .data)
                 try container.encode(type, forKey: .type)
                 try container.encode(sessionId, forKey: .sessionId)
@@ -168,13 +160,11 @@ struct GetConfigRequest: Encodable {
     func sendEvent(_ event: SPDiagnose.Event) async {
         do {
             var events: [Event] = []
-            let timestamp = Int(Date.now.timeIntervalSince1970)
             requestCount += 1
             switch event {
                 case .network(let domain, let tcString): 
                     events.append(
                         .network(
-                            ts: timestamp,
                             sessionId: sessionId,
                             requestCount: requestCount,
                             consentStatus: consentStatus,
@@ -188,7 +178,6 @@ struct GetConfigRequest: Encodable {
                 case .consent(let action):
                     events.append(
                         .consent(
-                            ts: timestamp,
                             sessionId: sessionId,
                             requestCount: requestCount,
                             consentStatus: consentStatus,
