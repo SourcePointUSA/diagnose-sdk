@@ -147,11 +147,11 @@ extension SPDiagnose {
         Task(priority: .high) {
             if !shouldGetConfig {
                 logger.log("Skipping getConfig call because config is still valid. Expires on \(state.expireOn?.description ?? "")")
+                completionHandler()
                 return
             }
 
             if let propertyConfig = (try? await api.getConfig())?.data {
-                state.sampling.updateAndSample(newRate: propertyConfig.samplingRate)
                 state.diagnoseAccountId = propertyConfig.diagnoseAccountId
                 state.diagnosePropertyId = propertyConfig.diagnosePropertyId
                 state.expireOn = propertyConfig.expireOn
