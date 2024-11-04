@@ -4,7 +4,8 @@
       "id" : "072474F4-6D4C-4A4B-AC32-25F8C671432C",
       "name" : "Test Scheme Action",
       "options" : {
-        "maximumTestRepetitions" : 10
+        "maximumTestRepetitions" : 10,
+        "testRepetitionMode" : "retryOnFailure"
       }
     }
   ],
@@ -14,25 +15,9 @@
       "identifier" : "827B61CB2B7E696700F2CB68",
       "name" : "iOSExample"
     },
-    "testRepetitionMode" : "fixedIterations"
+    "testRepetitionMode" : "retryOnFailure"
   },
   "testTargets" : [
-    {
-      "parallelizable" : true,
-      "target" : {
-        "containerPath" : "container:SPDiagnose.xcodeproj",
-        "identifier" : "827B61DC2B7E696900F2CB68",
-        "name" : "iOSExampleTests"
-      }
-    },
-    {
-      "parallelizable" : true,
-      "target" : {
-        "containerPath" : "container:SPDiagnose.xcodeproj",
-        "identifier" : "827B61E62B7E696900F2CB68",
-        "name" : "SPDiagnoseSDKUITests"
-      }
-    },
     {
       "parallelizable" : true,
       "target" : {

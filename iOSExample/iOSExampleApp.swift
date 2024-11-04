@@ -8,19 +8,37 @@
 import SwiftUI
 import SPDiagnose
 
+func sendRequestTo(_ url: String) {
+    guard let url = URL(string: url) else { return }
+    URLSession(configuration: .default)
+        .dataTask(with: URLRequest(url: url))
+        .resume()
+}
+
 @main
 struct iOSExampleApp: App {
     @UIApplicationDelegateAdaptor(SPDiagnoseAppDelegate.self) var appDelegate
 
+    @State var consentStatus: SPDiagnose.ConsentStatus = .noAction
+
+    func updateConsent(status: SPDiagnose.ConsentStatus) {
+        consentStatus = status
+        appDelegate.diagnose.updateConsent(status: status)
+    }
+
+    init() {
+        _consentStatus = State(initialValue: appDelegate.diagnose.consentStatus)
+    }
+
     var body: some Scene {
         WindowGroup {
             ContentView(
-                acceptAll: {
-                    Task { await appDelegate.diagnose.consentEvent(action: .acceptAll) }
-                },
-                rejectAll: {
-                    Task { await appDelegate.diagnose.consentEvent(action: .rejectAll) }
-                }
+                networkRequest: { sendRequestTo("https://sourcepoint.com") },
+                acceptAll: { updateConsent(status: .consentedAll) },
+                acceptSome: { updateConsent(status: .consentedSome) },
+                rejectAll: { updateConsent(status: .rejectedAll) },
+                resetStatus: { updateConsent(status: .noAction) },
+                currentStatus: consentStatus.rawValue
             )
         }
     }

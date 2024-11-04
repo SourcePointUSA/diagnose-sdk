@@ -8,29 +8,31 @@
 import Foundation
 
 enum Event: Encodable {
-    case network(ts: Int, data: NetworkEventData, type: String = "network")
-    case consent(ts: Int, data: ConsentEventData, type: String = "consent")
+    case network(sessionId: UUID, requestCount: Int, consentStatus: SPDiagnose.ConsentStatus, data: NetworkEventData, type: String = "network")
+    case consent(sessionId: UUID, requestCount: Int, consentStatus: SPDiagnose.ConsentStatus, data: ConsentEventData, type: String = "consent")
 
-    enum NetworkCodingKeys: CodingKey {
-        case ts, data, type
-    }
-
-    enum ConsentCodingKeys: CodingKey {
-        case ts, data, type
+    enum CodingKeys: String, CodingKey {
+        case data, type, consentStatus
+        case sessionId = "appSessionId"
+        case requestCount = "req"
     }
 
     func encode(to encoder: Encoder) throws {
         switch self {
-            case .network(let ts, let data, let type):
-                var container = encoder.container(keyedBy: NetworkCodingKeys.self)
-                try container.encode(ts, forKey: NetworkCodingKeys.ts)
-                try container.encode(data, forKey: NetworkCodingKeys.data)
-                try container.encode(type, forKey: NetworkCodingKeys.type)
-            case .consent(let ts, let data, let type):
-                var container = encoder.container(keyedBy: ConsentCodingKeys.self)
-                try container.encode(ts, forKey: ConsentCodingKeys.ts)
-                try container.encode(data, forKey: ConsentCodingKeys.data)
-                try container.encode(type, forKey: ConsentCodingKeys.type)
+            case .network(let sessionId, let requestCount, let consentStatus, let data, let type):
+                var container = encoder.container(keyedBy: CodingKeys.self)
+                try container.encode(data, forKey: .data)
+                try container.encode(type, forKey: .type)
+                try container.encode(sessionId, forKey: .sessionId)
+                try container.encode(requestCount, forKey: .requestCount)
+                try container.encode(consentStatus, forKey: .consentStatus)
+            case .consent(let sessionId, let requestCount, let consentStatus, let data, let type):
+                var container = encoder.container(keyedBy: CodingKeys.self)
+                try container.encode(data, forKey: .data)
+                try container.encode(type, forKey: .type)
+                try container.encode(sessionId, forKey: .sessionId)
+                try container.encode(requestCount, forKey: .requestCount)
+                try container.encode(consentStatus, forKey: .consentStatus)
         }
     }
 }
@@ -38,6 +40,7 @@ enum Event: Encodable {
 struct NetworkEventData: Encodable {
     let domain: String
     let gdprTCString: String?
+    let sampleRate: Float
 }
 
 struct ConsentEventData: Encodable {
@@ -46,41 +49,80 @@ struct ConsentEventData: Encodable {
 
 struct SendEventRequest: Encodable {
     let accountId, propertyId: Int
-    let appName: String?
+    let appName, diagnoseAccountId, diagnosePropertyId: String?
     let events: [Event]
-    let sessionId: UUID
 }
 
 struct SendEventResponse: Decodable {}
 
-struct GetMetaDataResponse: Decodable {
-    let samplingRate: Int
+struct GetConfigResponse: Decodable {
+    let data: GetConfigData
+
+    struct GetConfigData: Decodable {
+        let diagnoseAccountId: String?
+        let diagnosePropertyId: String?
+
+        private let expireOnString: String?
+        var expireOn: Date? {
+            let formatter = ISO8601DateFormatter()
+            formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+
+            if let expireOnString = expireOnString,
+               let parsedDate = formatter.date(from: expireOnString) {
+                return parsedDate
+            }
+            return nil
+        }
+
+        private let sampleRateRaw: Float?
+        var samplingRate: Int {
+            if let sampleRateRaw = sampleRateRaw
+            {
+                let percentageValue = sampleRateRaw * 100
+                let valueBetweenZeroAndHundred = min(max(percentageValue, 0), 100)
+                return Int(valueBetweenZeroAndHundred)
+            } else {
+                print("DiagnoseSDK: samplingRate missing in config, defaulting to 0.")
+                return 0
+            }
+        }
+
+        private enum CodingKeys: String, CodingKey {
+            case diagnoseAccountId = "diagnoseaccountid"
+            case diagnosePropertyId = "diagnosepropertyid"
+            case expireOnString = "expire_on"
+            case sampleRateRaw = "samplerate"
+        }
+    }
+}
+
+struct GetConfigRequest: Encodable {
+    let accountId, propertyId: Int
+    let apiKey: String
 }
 
 @objcMembers class SPDiagnoseAPI: NSObject {
     let accountId, propertyId: Int
+    let state: SPDiagnose.State
+    let authKey: String
     let appName: String?
-    lazy var sessionId = UUID()
+    let sessionId = UUID()
+    var consentStatus: SPDiagnose.ConsentStatus
+    var requestCount = 0
 
     var client: HttpClient
     var logger: SPLogger.Type?
 
-    public static var baseUrl: URL { URL(string: "https://compliance-api.sp-redbud.com")! }
-    static var eventsUrl: URL { URL(string: "/recordEvents/?_version=1.0.70", relativeTo: baseUrl)! }
-    static var metaDataBaseUrl: URL { URL(string: "/meta-data/?_version=1.0.70", relativeTo: baseUrl)! }
-
-    var metaDataUrl: URL {
-        Self.metaDataBaseUrl.appending(params: [
-            "accountId": String(accountId),
-            "propertyId": String(propertyId),
-            "appName": appName
-        ])!
-    }
+    public static var baseUrl: URL { URL(string: "https://sdk.sp-redbud.com/app/")! }
+    static var eventsUrl: URL { URL(string: "./recordEvents/", relativeTo: baseUrl)! }
+    static var getConfigUrl: URL { URL(string: "./getConfig/", relativeTo: baseUrl)! }
 
     init(
         accountId: Int,
         propertyId: Int,
         appName: String?,
+        state: SPDiagnose.State,
+        consentStatus: SPDiagnose.ConsentStatus,
         key: String,
         client: HttpClient? = nil,
         logger: SPLogger.Type = SPLogger.self
@@ -88,6 +130,9 @@ struct GetMetaDataResponse: Decodable {
         self.accountId = accountId
         self.propertyId = propertyId
         self.appName = appName
+        self.consentStatus = consentStatus
+        self.authKey = key
+        self.state = state
         guard let client = client else {
             self.client = SPHttpClient(auth: key)
             return
@@ -96,29 +141,30 @@ struct GetMetaDataResponse: Decodable {
         self.logger = logger
     }
 
-    func getConfig() {
-        logger?.log("DiagnoseAPI.getConfig()")
-    }
-
     func sendEvent(_ event: SPDiagnose.Event) async {
         do {
             var events: [Event] = []
-            let timestamp = Int(Date.now.timeIntervalSince1970)
+            requestCount += 1
             switch event {
                 case .network(let domain, let tcString): 
                     events.append(
                         .network(
-                            ts: timestamp,
+                            sessionId: sessionId,
+                            requestCount: requestCount,
+                            consentStatus: consentStatus,
                             data: .init(
                                 domain: domain,
-                                gdprTCString: tcString
+                                gdprTCString: tcString,
+                                sampleRate: Float(state.sampling.rate) / 100.0
                             )
                         )
                     )
                 case .consent(let action):
                     events.append(
                         .consent(
-                            ts: timestamp,
+                            sessionId: sessionId,
+                            requestCount: requestCount,
+                            consentStatus: consentStatus,
                             data: .init(consentAction: action)
                         )
                     )
@@ -129,8 +175,9 @@ struct GetMetaDataResponse: Decodable {
                     accountId: accountId,
                     propertyId: propertyId,
                     appName: appName,
-                    events: events,
-                    sessionId: sessionId
+                    diagnoseAccountId: state.diagnoseAccountId,
+                    diagnosePropertyId: state.diagnosePropertyId,
+                    events: events
                 )
             )
         } catch {
@@ -138,11 +185,15 @@ struct GetMetaDataResponse: Decodable {
         }
     }
 
-    func getMetaData() async throws -> GetMetaDataResponse {
+    func getConfig() async throws -> GetConfigResponse {
         do {
-            return try await client.get(metaDataUrl)
+            return try await client.post(Self.getConfigUrl, body: GetConfigRequest(
+                accountId: accountId,
+                propertyId: propertyId,
+                apiKey: authKey
+            ))
         } catch {
-            SPLogger.log("failed to getMetaData: \(error.localizedDescription)")
+            SPLogger.log("failed to getConfig: \(error.localizedDescription)")
             throw error
         }
     }

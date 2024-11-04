@@ -86,7 +86,18 @@ extension SPDiagnose {
 
 @objcMembers public class SPDiagnose: NSObject {
     let api: SPDiagnoseAPI
+    var state: State
+    let logger = SPLogger.self
     var networkSubscriber: NetworkSubscriber?
+
+    var shouldGetConfig: Bool {
+        if let expiresOn = state.expireOn {
+            return expiresOn <= .now
+        }
+        return true // if state.expireOn is nil
+    }
+
+    public var consentStatus: SPDiagnose.ConsentStatus { state.consentStatus }
 
     @objc public static func injectLogger(configuration: URLSessionConfiguration) {
         URLProtocol.registerClass(NetworkLogger.self)
@@ -103,11 +114,14 @@ extension SPDiagnose {
         } catch {
             fatalError("\(error)")
         }
+        let state = State.shared
 
         let api = SPDiagnoseAPI(
             accountId: config.accountId,
             propertyId: config.propertyId,
             appName: config.appName,
+            state: state,
+            consentStatus: state.consentStatus,
             key: config.key
         )
         let subscriber = NetworkSubscriber { domain in
@@ -123,13 +137,33 @@ extension SPDiagnose {
             }
         }
         self.init(api: api, subscriber: nil)
-        sampleAndSubscribe(subscriber)
+        getAndUpdateConfig { [weak self] in
+            self?.sampleAndSubscribe(subscriber)
+        }
+    }
+
+    func getAndUpdateConfig(completionHandler: @escaping () -> Void) {
+        Task(priority: .high) {
+            if !shouldGetConfig {
+                logger.log("Skipping getConfig call because config is still valid. Expires on \(state.expireOn?.description ?? "")")
+                completionHandler()
+                return
+            }
+
+            if let propertyConfig = (try? await api.getConfig())?.data {
+                state.sampling.updateAndSample(newRate: propertyConfig.samplingRate)
+                state.diagnoseAccountId = propertyConfig.diagnoseAccountId
+                state.diagnosePropertyId = propertyConfig.diagnosePropertyId
+                state.expireOn = propertyConfig.expireOn
+                state.persist()
+                completionHandler()
+            }
+        }
     }
 
     func sampleAndSubscribe(_ subscriber: NetworkSubscriber) {
         Task(priority: .high) {
-            let response = try await api.getMetaData()
-            if Sampling.shared.updateAndSample(newRate: response.samplingRate) == true {
+            if state.sampling.hit == true {
                 self.networkSubscriber = subscriber
             }
         }
@@ -137,13 +171,20 @@ extension SPDiagnose {
 
     init(api: SPDiagnoseAPI, subscriber: NetworkSubscriber?) {
         Self.injectLogger(configuration: URLSessionConfiguration.default)
+        self.state = State.shared
         self.api = api
         self.networkSubscriber = subscriber
     }
 
-    public func consentEvent(action: SPDiagnose.ConsentAction) async {
-        if Sampling.shared.hit == true {
+    func consentEvent(action: SPDiagnose.ConsentAction) async {
+        if state.sampling.hit == true {
             await api.sendEvent(.consent(action: action))
         }
+    }
+
+    public func updateConsent(status: SPDiagnose.ConsentStatus) {
+        state.consentStatus = status
+        api.consentStatus = status
+        state.persist()
     }
 }
