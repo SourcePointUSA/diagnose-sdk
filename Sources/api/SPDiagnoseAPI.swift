@@ -48,6 +48,7 @@ enum Event: Encodable {
 struct NetworkEventData: Encodable {
     let domain: String
     let gdprTCString: String?
+    let sampleRate: Float
 }
 
 struct ConsentEventData: Encodable {
@@ -126,7 +127,7 @@ struct GetConfigRequest: Encodable {
 
 @objcMembers class SPDiagnoseAPI: NSObject {
     let accountId, propertyId: Int
-    let diagnoseAccountId, diagnosePropertyId: String?
+    let state: SPDiagnose.State
     let authKey: String
     let appName: String?
     let sessionId = UUID()
@@ -144,8 +145,7 @@ struct GetConfigRequest: Encodable {
         accountId: Int,
         propertyId: Int,
         appName: String?,
-        diagnoseAccountId: String?,
-        diagnosePropertyId: String?,
+        state: SPDiagnose.State,
         consentStatus: SPDiagnose.ConsentStatus,
         key: String,
         client: HttpClient? = nil,
@@ -156,8 +156,7 @@ struct GetConfigRequest: Encodable {
         self.appName = appName
         self.consentStatus = consentStatus
         self.authKey = key
-        self.diagnoseAccountId = diagnoseAccountId
-        self.diagnosePropertyId = diagnosePropertyId
+        self.state = state
         guard let client = client else {
             self.client = SPHttpClient(auth: key)
             return
@@ -181,7 +180,8 @@ struct GetConfigRequest: Encodable {
                             consentStatus: consentStatus,
                             data: .init(
                                 domain: domain,
-                                gdprTCString: tcString
+                                gdprTCString: tcString,
+                                sampleRate: Float(state.sampling.rate) / 100.0
                             )
                         )
                     )
@@ -202,8 +202,8 @@ struct GetConfigRequest: Encodable {
                     accountId: accountId,
                     propertyId: propertyId,
                     appName: appName,
-                    diagnoseAccountId: diagnoseAccountId,
-                    diagnosePropertyId: diagnosePropertyId,
+                    diagnoseAccountId: state.diagnoseAccountId,
+                    diagnosePropertyId: state.diagnosePropertyId,
                     events: events
                 )
             )

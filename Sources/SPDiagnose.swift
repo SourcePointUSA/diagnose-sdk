@@ -120,8 +120,7 @@ extension SPDiagnose {
             accountId: config.accountId,
             propertyId: config.propertyId,
             appName: config.appName,
-            diagnoseAccountId: state.diagnoseAccountId,
-            diagnosePropertyId: state.diagnosePropertyId,
+            state: state,
             consentStatus: state.consentStatus,
             key: config.key
         )
