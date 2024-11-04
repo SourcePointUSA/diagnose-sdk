@@ -151,6 +151,7 @@ extension SPDiagnose {
             }
 
             if let propertyConfig = (try? await api.getConfig())?.data {
+                state.sampling.updateAndSample(newRate: propertyConfig.samplingRate)
                 state.diagnoseAccountId = propertyConfig.diagnoseAccountId
                 state.diagnosePropertyId = propertyConfig.diagnosePropertyId
                 state.expireOn = propertyConfig.expireOn

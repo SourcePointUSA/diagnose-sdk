@@ -12,8 +12,8 @@ enum Event: Encodable {
     case consent(sessionId: UUID, requestCount: Int, consentStatus: SPDiagnose.ConsentStatus, data: ConsentEventData, type: String = "consent")
 
     enum CodingKeys: String, CodingKey {
-        case data, type, sessionId
-        case consentStatus = "consent_status"
+        case data, type, consentStatus
+        case sessionId = "appSessionId"
         case requestCount = "req"
     }
 
@@ -74,12 +74,11 @@ struct GetConfigResponse: Decodable {
             return nil
         }
 
-        private let sampleRateString: String?
+        private let sampleRateRaw: Float?
         var samplingRate: Int {
-            if let sampleRateString = sampleRateString,
-               let doubleValue = Double(sampleRateString)
+            if let sampleRateRaw = sampleRateRaw
             {
-                let percentageValue = doubleValue * 100
+                let percentageValue = sampleRateRaw * 100
                 let valueBetweenZeroAndHundred = min(max(percentageValue, 0), 100)
                 return Int(valueBetweenZeroAndHundred)
             } else {
@@ -88,26 +87,11 @@ struct GetConfigResponse: Decodable {
             }
         }
 
-        init(diagnoseAccountId: String? = nil, diagnosePropertyId: String? = nil, expireOnString: String? = nil, sampleRateString: String? = nil) {
-            self.diagnoseAccountId = diagnoseAccountId
-            self.diagnosePropertyId = diagnosePropertyId
-            self.expireOnString = expireOnString
-            self.sampleRateString = sampleRateString
-        }
-
-        init(from decoder: any Decoder) throws {
-            let dataContainer = try? decoder.container(keyedBy: CodingKeys.self)
-            diagnoseAccountId = try dataContainer?.decodeIfPresent(String.self, forKey: .diagnoseAccountId)
-            diagnosePropertyId = try dataContainer?.decodeIfPresent(String.self, forKey: .diagnosePropertyId)
-            sampleRateString = try dataContainer?.decodeIfPresent(String.self, forKey: .sampleRateString)
-            expireOnString = try dataContainer?.decodeIfPresent(String.self, forKey: .expireOnString)
-        }
-
         private enum CodingKeys: String, CodingKey {
             case diagnoseAccountId = "diagnoseaccountid"
             case diagnosePropertyId = "diagnosepropertyid"
             case expireOnString = "expire_on"
-            case sampleRateString = "sample_rate"
+            case sampleRateRaw = "samplerate"
         }
     }
 }
