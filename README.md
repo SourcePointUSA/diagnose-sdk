@@ -28,16 +28,16 @@ In the following sections, we will cover the necessary steps to configure and in
 
 ### `SPDiagnoseConfig.plist`
 
-Add a property list file to your project called `SPDiagnoseConfig.plist` to your project. This file contains the key account configurations needed to map your setup to your Diagnose account in the Sourcepoint portal.
+Add a property list file called `SPDiagnoseConfig.plist` to your project. This file contains the key account configurations needed to map your setup to your Diagnose account in the Sourcepoint portal.
 
 Review the table below for all the required key-value pairs in the property list file:
 
-| **Key**    | **Value Type** | **Value Description**                                                                                                                                                                                   |
-| ---------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| appName    | string         | Name of your iOS mobile app                                                                                                                                                                             |
-| propertyId | integer        | ID of property within the Sourcepoint portal. Your Sourcepoint Account Manager will provide you with this value                                                                                         |
-| accountId  | integer        | Associates the property with your organization's Sourcepoint account. Value can be retrieved by contacting your Sourcepoint Account Manager or via the **My Account** page in your Sourcepoint account. |
-| key        | integer        | Your Sourcepoint Account Manager will provide you with this value                                                                                                                                       |
+| **Key**    | **Value Type** | **Value Description**                                                                                                                                                       |
+| ---------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| appName    | string         | Name of the app property added or imported into your Diagnose account. Value can be retrieved by visiting the **App > Properties** page.                                    |
+| propertyId | integer        | ID assigned to the app property added or imported into your Diagnose account. Value can be retrieved by visiting the **App > Properties** page.                             |
+| accountId  | integer        | Associates the property with your organization's Sourcepoint account. Value can be retrieved by contacting your Sourcepoint Account Manager or via the **My Account** page. |
+| key        | integer        | Contact your Account Manager to retrieve the API key for your organization.                                                                                                 |
 
 ```plist
 <?xml version="1.0" encoding="UTF-8"?>
@@ -89,15 +89,18 @@ public class SPDiagnoseAppDelegate: NSObject, UIApplicationDelegate {
 
 ### Signaling consent
 
-The Diagnose SDK is CMP agnostic by design. In order to determine the consent status of a given user, your app needs to call the method `updateConsent(status: SPDiagnose.ConsentStatus)`, ideally as soon as the user makes a consent choice (pressiong on a accept all vendors/purposes button for example).
+The Diagnose SDK is CMP agnostic by design. In order to determine the consent status of a given user, your app needs to call the method `updateConsent(status: SPDiagnose.ConsentStatus)`, ideally as soon as the user makes a consent choice (pressing an accept all vendors/purposes button for example).
 
 The `SPDiagnose.ConsentStatus` enum can assume the following values:
-* `noAction` -> that is the default consent status of a new user, or a user that has not yet made a consent choice.
-* `consentedAll` -> used to signal the user _accepted_ all vendors/purposes on a consent prompt.
-* `consentedSome` -> used to signal the user has accepted some, but not all, vendors/purposes on a consent prompt, ie. by enabling only some vendors.
-* `rejectedAll` -> used to signal the user _rejected_ all vendors/purposes on a consent prompt.
 
-_In the future, when integrate both Diagnose and Dialogue SDKs together, this step won't be necessary. The Dialogue SDK will automatically signal consent choice to Diagnose._
+| **Value**       | **Description**                                                                                                                  |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `noAction`      | This is the default consent status of a new user, or a user that has not yet made a consent choice.                              |
+| `consentedAll`  | Used to signal the user accepted all vendors/purposes on a consent prompt                                                        |
+| `consentedSome` | Used to signal the user has accepted some, but not all, vendors/purposes on a consent prompt (eg by enabling only some vendors). |
+| `rejectedAll`   | Used to signal the user rejected all vendors/purposes on a consent prompt.                                                       |
+
+> _In the future, when integrating both Diagnose and Dialogue SDKs together, this step won't be necessary. The Dialogue SDK will automatically signal consent choice to Diagnose._
 
 ## FAQs
 
